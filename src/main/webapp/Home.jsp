@@ -8,6 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sandur Residential School</title>
+
 <style>
 /* ----- Global ----- */
 body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
@@ -17,17 +18,60 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
 .header img { height: 120px; width: auto; }
 .header h1 { font-size: 2rem; color: #753906; margin: 0; font-weight: bold; text-align: center; }
 
-/* ----- Navbar ----- */
+/* ----- NAVBAR (Updated) ----- */
 .navbar { background-color: #F2F2F2; text-align: center; }
 .navbar ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; }
 .navbar li { position: relative; }
-.navbar > ul > li > a { display: block; color: black; text-decoration: none; padding: 18px 25px; transition: all 0.3s ease; font-size: 1.2rem; }
-.navbar > ul > li > a:hover { background-color: #753906; color: white; }
-/* Dropdown */
-.navbar li ul { display: none; position: absolute; background-color: #444; min-width: 160px; top: 48px; left: 0; z-index: 999; list-style: none; padding: 0; margin: 0; border-radius: 0 0 6px 6px; }
+
+.navbar > ul > li > a {
+    display: block;
+    color: black;
+    text-decoration: none;
+    padding: 18px 25px;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.navbar > ul > li > a:hover {
+    background-color: #753906;
+    color: white;
+}
+
+/* ----- UPDATED DROPDOWN ----- */
+.navbar li ul {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 58px;
+
+    /* Updated color */
+    background-color: #753906;
+
+    min-width: 180px;
+    z-index: 999;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 0 0 6px 6px;
+}
+
 .navbar li:hover > ul { display: block; }
-.navbar li ul li a { display: block; padding: 10px 16px; color: white; text-decoration: none; white-space: nowrap; transition: background-color 0.3s ease; }
-.navbar li ul li a:hover { background-color: #666; }
+
+.navbar li ul li a {
+    display: block;
+    padding: 12px 18px;
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 1rem;
+
+    /* Better alignment */
+    text-align: left;
+}
+
+.navbar li ul li a:hover {
+    background-color: #5e2d04; /* darker shade */
+}
 
 /* ----- Slideshow ----- */
 .slideshow-container { position: relative; width: 100%; height: 80vh; overflow: hidden; }
@@ -68,11 +112,16 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
 .event-item h4 { color: #000; font-weight: bold; margin: 0; }
 .event-item p { color: #555; margin: 3px 0; }
 
-/* ----- Distinctly SRS Section ----- */
+/* ----- DISTINCTLY SRS (Size Increased 20%) ----- */
 .distinctly-section { position: relative; background-color: white; padding: 60px 0; overflow: hidden; }
 .distinctly-section::after { content: ""; position: absolute; bottom: 0; right: 0; width: 60%; height: 45%; background-color: #D76A28; z-index: 0; }
-.distinctly-container { position: relative; z-index: 2; width: 65%; margin: 0 auto; }
-.distinctly-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; justify-items: center; }
+.distinctly-container { position: relative; z-index: 2; width: 78%; margin: 0 auto; } /* increased 20% from 65% → 78% */
+
+.distinctly-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px; /* slightly increased for spacing */
+}
 
 /* Grid Box */
 .grid-box { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: transform 0.4s ease; }
@@ -87,15 +136,16 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
 .hover-text p { font-size: 1rem; line-height: 1.6; }
 .grid-item:hover .hover-text { opacity: 1; }
 
-/* ----- Footer ----- */
+/* Footer */
 footer { background-color: #333; color: white; text-align: center; padding: 15px 0; }
 
-/* ----- Responsive ----- */
+/* Responsive */
 @media (max-width: 992px) { .distinctly-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 900px) { .director-content { flex-direction: column; } .director-text { padding: 40px 30px; } .director-video { padding: 30px; justify-content: center; } .director-video video { width: 90%; } }
 @media (max-width: 600px) { .distinctly-grid { grid-template-columns: 1fr; } .slideshow-container { height: 50vh; } .header { flex-direction: column; text-align: center; } }
 </style>
 </head>
+
 <body>
 
 <!-- Header -->
@@ -104,10 +154,11 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
     <h1>Sandur Residential School</h1>
 </div>
 
-<!-- Navbar -->
+<!-- NAVBAR updated -->
 <div class="navbar">
     <ul>
         <li><a href="#">Home</a></li>
+
         <li><a href="#">About ▾</a>
             <ul>
                 <li><a href="#">Our Mission</a></li>
@@ -115,6 +166,7 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
                 <li><a href="#">History</a></li>
             </ul>
         </li>
+
         <li><a href="#">Admissions ▾</a>
             <ul>
                 <li><a href="#">Web Design</a></li>
@@ -122,6 +174,7 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
                 <li><a href="#">Hosting</a></li>
             </ul>
         </li>
+
         <li><a href="#">Learning</a></li>
         <li><a href="#">Student Life</a></li>
         <li><a href="#">Engage</a></li>
@@ -161,9 +214,10 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
 <section class="news-events-section">
     <h2>News & Events</h2>
     <p>Campus is always buzzing! Click below to stay up-to-date on our school to see all of the news & announcements and school calendar.</p>
+
     <div class="news-events-container">
         
-        <!-- Latest News -->
+        <!-- News -->
         <div class="news-box">
             <h3>LATEST NEWS</h3>
             <c:forEach var="news" items="${newsList}">
@@ -178,7 +232,7 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
             </c:forEach>
         </div>
 
-        <!-- Upcoming Events -->
+        <!-- Events -->
         <div class="events-box">
             <h3>UPCOMING EVENTS</h3>
             <c:forEach var="event" items="${eventList}">
@@ -197,8 +251,87 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
     </div>
 </section>
 
-<!-- Distinctly SRS Section -->
-<!-- Distinctly SRS Section --> <section class="distinctly-section"> <div class="distinctly-container"> <div class="distinctly-grid"> <div class="grid-box distinctly-text"> <h2>Distinctly SRS</h2> <p> We have a sprawling campus spread over 75 acres, we often teach under the shade of a tree, we are frequented by various birds species and there is plenty to learn from the rich flora around. <br>We also encourage debates, clubs, community activities of Environmental matters </p> </div> <div class="grid-box grid-item"> <img src="Home/campuslife.jpg" alt="Campus Life"> <div class="hover-text"> <h4>Campus Life</h4> <p> To instill a strong over all development of a student, we give equal importance to academics, sports, arts, literature, and culture </p> </div> <div class="grid-caption">Campus Life</div> </div> <div class="grid-box grid-item"> <img src="Home/overall.jpg" alt="Overall Development"> <div class="hover-text"> <h4>Overall Development</h4> <p>We give equal importance to academics, sports, arts, literature, and culture.</p> </div> <div class="grid-caption">Overall Development</div> </div> <div class="grid-box grid-item"> <img src="Home/quickfacts.jpg" alt="Quick Facts"> <div class="hover-text"> <h4>Quick Facts</h4> <p> We provide ICSE curriculum. <br> We are a Co-educational school.<br> We have a combination of day-scholars and boarders.<br> We have 1700 students in our school.<br> We have a sprawling campus of 25 acres.<br> Boarding facility is for both boys and girls. </p> </div> <div class="grid-caption">Quick Facts</div> </div> <div class="grid-box grid-item"> <img src="Home/legacy.jpg" alt="Explore our legacy"> <div class="hover-text"> <h4>Explore Our Legacy</h4> <p> Look into the section of 'Our Legacy' and 'History of our school' to read about our story from 1959. </p> </div> <div class="grid-caption">Explore Our Legacy</div> </div> <div class="grid-box grid-item"> <img src="Home/engage.jpg" alt="Engage"> <div class="hover-text"> <h4>Engage</h4> <p> With a sprawling campus and a rich ecosystem within the space, we inculcate a sense of discovery and inquisitiveness among our children about nature. We provide them with the learning tools, talks and experiments are conducted by researchers, naturalists and scientists who visit our campus. <br>Learn more about being engaged in our website section </p> </div> <div class="grid-caption">Engage</div> </div> </div> </div> </section>
+<!-- Distinctly SRS -->
+<section class="distinctly-section">
+    <div class="distinctly-container">
+        <div class="distinctly-grid">
+
+            <div class="grid-box distinctly-text">
+                <h2>Distinctly SRS</h2>
+                <p>
+                    Discover our school by navigating through our posts, blogs and news. 
+
+
+                </p>
+            </div>
+
+            <div class="grid-box grid-item">
+                <img src="Home/campuslife.jpg" alt="Campus Life">
+                <div class="hover-text">
+                    <h4>Campus Life</h4>
+                    <p>We have a sprawling campus spread over 75 acres, we often teach under the shade of a tree, we are frequented by various birds species and there is plenty to learn from the rich flora around.
+
+<br>We also encourage debates, clubs, community activities of Environmental matters</p>
+                </div>
+                <div class="grid-caption">Campus Life</div>
+            </div>
+
+            <div class="grid-box grid-item">
+                <img src="Home/overall.jpg" alt="Overall Development">
+                <div class="hover-text">
+                    <h4>Overall Development</h4>
+                    <p>To instill a strong over all development of a student, we give equal importance to academics, sports, arts, literature, and culture.</p>
+                </div>
+                <div class="grid-caption">Overall Development</div>
+            </div>
+
+            <div class="grid-box grid-item">
+                <img src="Home/quickfacts.jpg" alt="Quick Facts">
+                <div class="hover-text">
+                    <h4>Quick Facts</h4>
+                    <p>
+                    We provide ICSE curriculum. <br>
+
+We are a Co-educational school.<br>
+
+We have a combination of day-scholars and boarders.<br>
+
+We have 1700 students in our school.<br>
+
+We have a sprawling campus of 25 acres.<br>
+
+Boarding facility is for both boys and girls.<br>
+                    
+                    </p>
+                </div>
+                <div class="grid-caption">Quick Facts</div>
+            </div>
+
+            <div class="grid-box grid-item">
+                <img src="Home/legacy.jpg" alt="Explore our legacy">
+                <div class="hover-text">
+                    <h4>Explore Our Legacy</h4>
+                    <p>Look into the section of 'Our Legacy' and 'History of our school' to read about our story from 1959.
+
+</p>
+                </div>
+                <div class="grid-caption">Explore Our Legacy</div>
+            </div>
+
+            <div class="grid-box grid-item">
+                <img src="Home/engage.jpg" alt="Engage">
+                <div class="hover-text">
+                    <h4>Engage</h4>
+                    <p>With a sprawling campus and a rich ecosystem within the space, we inculcate a sense of discovery and inquisitiveness  among our children about nature. We provide them with the learning tools, talks and experiments are conducted by researchers, naturalists and scientists who visit our campus.   
+
+</p>
+                </div>
+                <div class="grid-caption">Engage</div>
+            </div>
+
+        </div>
+    </div>
+</section>
 
 <!-- Footer -->
 <footer>
@@ -208,6 +341,7 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
 <script>
 let slideIndex = 0;
 showSlides();
+
 function showSlides() {
     const slides = document.getElementsByClassName("slide");
     for (let i = 0; i < slides.length; i++) slides[i].style.display = "none";
@@ -218,5 +352,6 @@ function showSlides() {
     setTimeout(showSlides, 3000);
 }
 </script>
+
 </body>
 </html>
