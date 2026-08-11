@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +19,7 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
 .header img { height: 120px; width: auto; }
 .header h1 { font-size: 2rem; color: #753906; margin: 0; font-weight: bold; text-align: center; }
 
-/* ----- NAVBAR (Updated) ----- */
+/* ----- NAVBAR ----- */
 .navbar { background-color: #F2F2F2; text-align: center; }
 .navbar ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; }
 .navbar li { position: relative; }
@@ -37,16 +38,13 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
     color: white;
 }
 
-/* ----- UPDATED DROPDOWN ----- */
+/* ----- DROPDOWN ----- */
 .navbar li ul {
     display: none;
     position: absolute;
     left: 0;
     top: 58px;
-
-    /* Updated color */
     background-color: #753906;
-
     min-width: 180px;
     z-index: 999;
     list-style: none;
@@ -64,13 +62,11 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
     text-decoration: none;
     white-space: nowrap;
     font-size: 1rem;
-
-    /* Better alignment */
     text-align: left;
 }
 
 .navbar li ul li a:hover {
-    background-color: #5e2d04; /* darker shade */
+    background-color: #5e2d04;
 }
 
 /* ----- Slideshow ----- */
@@ -112,15 +108,15 @@ body { margin: 0; font-family: Arial, sans-serif; background: #f4f4f4; }
 .event-item h4 { color: #000; font-weight: bold; margin: 0; }
 .event-item p { color: #555; margin: 3px 0; }
 
-/* ----- DISTINCTLY SRS (Size Increased 20%) ----- */
+/* ----- DISTINCTLY SRS ----- */
 .distinctly-section { position: relative; background-color: white; padding: 60px 0; overflow: hidden; }
 .distinctly-section::after { content: ""; position: absolute; bottom: 0; right: 0; width: 60%; height: 45%; background-color: #D76A28; z-index: 0; }
-.distinctly-container { position: relative; z-index: 2; width: 78%; margin: 0 auto; } /* increased 20% from 65% → 78% */
+.distinctly-container { position: relative; z-index: 2; width: 78%; margin: 0 auto; }
 
 .distinctly-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px; /* slightly increased for spacing */
+    gap: 30px;
 }
 
 /* Grid Box */
@@ -154,7 +150,7 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
     <h1>Sandur Residential School</h1>
 </div>
 
-<!-- NAVBAR updated -->
+<!-- NAVBAR -->
 <div class="navbar">
     <ul>
         <li><a href="#">Home</a></li>
@@ -183,19 +179,19 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
     </ul>
 </div>
 
-<!-- Slideshow -->
+<!-- Slideshow (Optimized WebP Images) -->
 <div class="slideshow-container">
-    <div class="slide fade"><img src="Home/1.jpg" alt="Slide 1"></div>
-    <div class="slide fade"><img src="Home/2.jpg" alt="Slide 2"></div>
-    <div class="slide fade"><img src="Home/3.jpg" alt="Slide 3"></div>
+    <div class="slide fade"><img src="HomepageImages/hpic1.webp" alt="Sandur Residential School"></div>
+    <div class="slide fade"><img src="HomepageImages/hpic2.webp" alt="Holistic Student Development"></div>
+    <div class="slide fade"><img src="HomepageImages/hpic3.webp" alt="Modern Learning Environment"></div>
 </div>
 
-<!-- Director Section -->
+<!-- Director Section (Optimized Video Stream) -->
 <section class="director-section">
     <div class="director-content">
         <div class="director-video">
-            <video width="100%" height="auto" controls autoplay muted loop>
-                <source src="Home/MD.mp4" type="video/mp4">
+            <video width="100%" height="auto" controls autoplay muted loop playsinline preload="metadata">
+                <source src="HomepageImages/MD.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -222,7 +218,7 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
             <h3>LATEST NEWS</h3>
             <c:forEach var="news" items="${newsList}">
                 <div class="news-item">
-                    <img src="uploads/${news.image}" alt="${news.title}">
+                    <img src="uploads/${news.image}" alt="${news.title}" loading="lazy">
                     <div>
                         <h4>${news.title}</h4>
                         <p>${fn:substring(news.description,0,100)}...</p>
@@ -251,33 +247,27 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
     </div>
 </section>
 
-<!-- Distinctly SRS -->
+<!-- Distinctly SRS (Lazy Loaded Images) -->
 <section class="distinctly-section">
     <div class="distinctly-container">
         <div class="distinctly-grid">
 
             <div class="grid-box distinctly-text">
                 <h2>Distinctly SRS</h2>
-                <p>
-                    Discover our school by navigating through our posts, blogs and news. 
-
-
-                </p>
+                <p>Discover our school by navigating through our posts, blogs and news.</p>
             </div>
 
             <div class="grid-box grid-item">
-                <img src="Home/campuslife.jpg" alt="Campus Life">
+                <img src="HomepageImages/3stu.webp" alt="Campus Life" loading="lazy">
                 <div class="hover-text">
                     <h4>Campus Life</h4>
-                    <p>We have a sprawling campus spread over 75 acres, we often teach under the shade of a tree, we are frequented by various birds species and there is plenty to learn from the rich flora around.
-
-<br>We also encourage debates, clubs, community activities of Environmental matters</p>
+                    <p>We have a sprawling campus spread over 75 acres, we often teach under the shade of a tree, we are frequented by various birds species and there is plenty to learn from the rich flora around.<br>We also encourage debates, clubs, community activities of Environmental matters</p>
                 </div>
                 <div class="grid-caption">Campus Life</div>
             </div>
 
             <div class="grid-box grid-item">
-                <img src="Home/overall.jpg" alt="Overall Development">
+                <img src="HomepageImages/Tennis.webp" alt="Overall Development" loading="lazy">
                 <div class="hover-text">
                     <h4>Overall Development</h4>
                     <p>To instill a strong over all development of a student, we give equal importance to academics, sports, arts, literature, and culture.</p>
@@ -286,45 +276,35 @@ footer { background-color: #333; color: white; text-align: center; padding: 15px
             </div>
 
             <div class="grid-box grid-item">
-                <img src="Home/quickfacts.jpg" alt="Quick Facts">
+                <img src="HomepageImages/3stu.webp" alt="Quick Facts" loading="lazy">
                 <div class="hover-text">
                     <h4>Quick Facts</h4>
                     <p>
                     We provide ICSE curriculum. <br>
-
-We are a Co-educational school.<br>
-
-We have a combination of day-scholars and boarders.<br>
-
-We have 1700 students in our school.<br>
-
-We have a sprawling campus of 25 acres.<br>
-
-Boarding facility is for both boys and girls.<br>
-                    
+                    We are a Co-educational school.<br>
+                    We have a combination of day-scholars and boarders.<br>
+                    We have 1700 students in our school.<br>
+                    We have a sprawling campus of 25 acres.<br>
+                    Boarding facility is for both boys and girls.<br>
                     </p>
                 </div>
                 <div class="grid-caption">Quick Facts</div>
             </div>
 
             <div class="grid-box grid-item">
-                <img src="Home/legacy.jpg" alt="Explore our legacy">
+                <img src="HomepageImages/old.webp" alt="Explore our legacy" loading="lazy">
                 <div class="hover-text">
                     <h4>Explore Our Legacy</h4>
-                    <p>Look into the section of 'Our Legacy' and 'History of our school' to read about our story from 1959.
-
-</p>
+                    <p>Look into the section of 'Our Legacy' and 'History of our school' to read about our story from 1959.</p>
                 </div>
                 <div class="grid-caption">Explore Our Legacy</div>
             </div>
 
             <div class="grid-box grid-item">
-                <img src="Home/engage.jpg" alt="Engage">
+                <img src="HomepageImages/2girls.webp" alt="Engage" loading="lazy">
                 <div class="hover-text">
                     <h4>Engage</h4>
-                    <p>With a sprawling campus and a rich ecosystem within the space, we inculcate a sense of discovery and inquisitiveness  among our children about nature. We provide them with the learning tools, talks and experiments are conducted by researchers, naturalists and scientists who visit our campus.   
-
-</p>
+                    <p>With a sprawling campus and a rich ecosystem within the space, we inculcate a sense of discovery and inquisitiveness among our children about nature. We provide them with the learning tools, talks and experiments are conducted by researchers, naturalists and scientists who visit our campus.</p>
                 </div>
                 <div class="grid-caption">Engage</div>
             </div>
@@ -335,7 +315,7 @@ Boarding facility is for both boys and girls.<br>
 
 <!-- Footer -->
 <footer>
-    <p>© 2025 Sandur Residential School | Designed by Uday Kumar</p>
+    <p>© 2026 Sandur Residential School | Designed by Uday Kumar</p>
 </footer>
 
 <script>
