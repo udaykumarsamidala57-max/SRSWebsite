@@ -128,7 +128,7 @@
 </head>
 
 <body>
-
+<%@ include file="Header.jsp" %>
 <div class="diagnostic-container">
     <h1>Servlet Image Diagnostic Page</h1>
 
