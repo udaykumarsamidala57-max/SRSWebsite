@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet("/home")
+@WebServlet("/homepage")
 public class HomePageServlet extends HttpServlet {
 
     @Override

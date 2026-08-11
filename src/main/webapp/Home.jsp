@@ -17,6 +17,7 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
+            background-color: #f7f5f2;
         }
 
         .diagnostic-container {
@@ -124,33 +125,138 @@
             background-color: #ffffff;
             transform: scale(1.2);
         }
+
+        /* ========================================== */
+        /* DISTINCT / DISTRICT SECTION STYLES         */
+        /* ========================================== */
+        .distinct-section-wrapper {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Orange Accent Block in Background */
+        .distinct-accent-bg {
+            position: absolute;
+            bottom: -30px;
+            right: 0;
+            width: 60%;
+            height: 60%;
+            background-color: #e06d38;
+            z-index: 1;
+        }
+
+        .distinct-grid {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .distinct-header-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .distinct-header-card h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 36px;
+            color: #5b2d0a;
+            margin-bottom: 15px;
+        }
+
+        .distinct-header-card p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .distinct-img-card {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            background: #222;
+            cursor: pointer;
+        }
+
+        .distinct-img-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .distinct-img-card:hover img {
+            transform: scale(1.08);
+        }
+
+        /* Overlay hidden by default, revealed on hover */
+        .distinct-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .distinct-img-card:hover .distinct-img-overlay {
+            opacity: 1;
+        }
+
+        .distinct-img-overlay h3 {
+            margin: 0;
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4; /* Adds clean spacing when text wraps to 2 lines */
+            letter-spacing: 0.3px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9);
+            transform: translateY(10px);
+            transition: transform 0.3s ease-in-out;
+            word-wrap: break-word;
+        }
+
+        .distinct-img-card:hover .distinct-img-overlay h3 {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 900px) {
+            .distinct-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .distinct-header-card {
+                grid-column: span 2;
+            }
+            .distinct-accent-bg {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .distinct-grid {
+                grid-template-columns: 1fr;
+            }
+            .distinct-header-card {
+                grid-column: span 1;
+            }
+        }
     </style>
 </head>
 
 <body>
+
 <%@ include file="Header.jsp" %>
-<div class="diagnostic-container">
-    <h1>Servlet Image Diagnostic Page</h1>
-
-    <p>
-        Page Loaded:
-        <strong>
-            <c:out value="${pageData.title}" default="Page Data Not Found" />
-        </strong>
-        (Slug:
-        <code><c:out value="${pageData.slug}" /></code>,
-        ID:
-        <code><c:out value="${pageData.id}" /></code>)
-    </p>
-
-    <h2>
-        2. Dynamic Images from PageBean
-        (
-        <c:out value="${pageData.sections.size()}" default="0" />
-        Sections Found
-        )
-    </h2>
-</div>
 
 <c:choose>
 
@@ -227,6 +333,59 @@
                             </c:otherwise>
 
                         </c:choose>
+
+                    </div>
+
+                </c:when>
+
+                <%-- DISTINCT / DISTRICT SECTION: GRID WITH HOVER ALT TEXT & ACCENT BG --%>
+                <c:when test="${fn:toLowerCase(sec.sectionType) eq 'distinct' or fn:toLowerCase(sec.sectionType) eq 'district'}">
+
+                    <div class="distinct-section-wrapper">
+                        
+                        <!-- Background Accent Box -->
+                        <div class="distinct-accent-bg"></div>
+
+                        <div class="distinct-grid">
+
+                            <!-- Top Left Text / Title Block -->
+                            <div class="distinct-header-card">
+                                <h2><c:out value="${sec.title}" default="Distinctly SRS" /></h2>
+                                <p>Discover our school by navigating through our posts, blogs and news.</p>
+                            </div>
+
+                            <!-- Dynamic Image Grid (Hover shows altText from DB) -->
+                            <c:choose>
+                                <c:when test="${not empty sec.images}">
+                                    <c:forEach var="img" items="${sec.images}">
+                                        <div class="distinct-img-card">
+                                            <img
+                                                src="${pageContext.request.contextPath}/imageStream?id=${img.id}"
+                                                alt="${img.altText}"
+                                            >
+                                            <div class="distinct-img-overlay">
+                                                <h3>
+                                                    <c:choose>
+                                                        <c:when test="${not empty img.altText}">
+                                                            <c:out value="${img.altText}" />
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:out value="${img.imageType}" default="Explore" />
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="distinct-img-card" style="grid-column: span 2; display:flex; align-items:center; justify-content:center; color:#fff;">
+                                        <p style="padding: 20px;">No images available for this section.</p>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+
+                        </div>
 
                     </div>
 
