@@ -10,8 +10,8 @@
         <h2>Sandur Residential School</h2>
         <p class="address">Shivapur, Sandur – 583119 · Ballari District, Karnataka · India</p>
 
-        <a href="${pageContext.request.contextPath}/contact.jsp" class="contact-btn">
-            CONTACT US <i class="fa fa-arrow-right"></i>
+        <a href="${pageContext.request.contextPath}/contact.jsp" class="contact-btn"> 
+        CONTACT US <i class="fa fa-arrow-right"></i>
         </a>
 
         <div class="disclaimer">

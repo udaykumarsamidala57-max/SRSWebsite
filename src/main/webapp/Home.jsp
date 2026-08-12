@@ -11,229 +11,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Raw Image Load Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Sections & Image Loader</title>
+    
+    <!-- External Section Stylesheet -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/sections.css">
+    
+    <!-- Typography / Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f7f5f2;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--sec-bg-light, #f7f5f2);
+            color: var(--sec-text-dark, #222222);
         }
-
-        .diagnostic-container {
-            padding: 20px;
-        }
-
-        /* ========================================== */
-        /* FULL SCREEN HERO SLIDESHOW STYLES          */
-        /* ========================================== */
-        .hero-fullscreen-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        .hero-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .hero-slide.active {
-            opacity: 1;
-            z-index: 1;
-        }
-
-        /* Fullscreen Image Cover */
-        .hero-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        /* Overlay text for diagnostic image status */
-        .hero-slide-info {
-            position: absolute;
-            bottom: 60px;
-            left: 30px;
-            z-index: 2;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px 20px;
-            border-radius: 8px;
-            backdrop-filter: blur(4px);
-        }
-
-        /* Navigation Arrows */
-        .hero-nav {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            transform: translateY(-50%);
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .hero-nav button {
-            pointer-events: auto;
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            border: none;
-            padding: 20px 15px;
-            cursor: pointer;
-            font-size: 24px;
-            transition: background 0.3s;
-        }
-
-        .hero-nav button:hover {
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        /* Pagination Dots */
-        .hero-dots {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .dot {
-            height: 14px;
-            width: 14px;
-            margin: 0 6px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            display: inline-block;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .dot.active, .dot:hover {
-            background-color: #ffffff;
-            transform: scale(1.2);
-        }
-
-        /* ========================================== */
-        /* DISTINCT / DISTRICT SECTION STYLES         */
-        /* ========================================== */
-        .distinct-section-wrapper {
-            max-width: 1200px;
-            margin: 60px auto;
-            padding: 0 20px;
-            position: relative;
-        }
-
-        /* Orange Accent Block in Background */
-        .distinct-accent-bg {
-            position: absolute;
-            bottom: -30px;
-            right: 0;
-            width: 60%;
-            height: 60%;
-            background-color: #e06d38;
-            z-index: 1;
-        }
-
-        .distinct-grid {
-            position: relative;
-            z-index: 2;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .distinct-header-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .distinct-header-card h2 {
-            font-family: 'Merriweather', serif;
-            font-size: 36px;
-            color: #5b2d0a;
-            margin-bottom: 15px;
-        }
-
-        .distinct-header-card p {
-            color: #555;
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        .distinct-img-card {
-            position: relative;
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            background: #222;
-            cursor: pointer;
-        }
-
-        .distinct-img-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s ease;
-        }
-
-        .distinct-img-card:hover img {
-            transform: scale(1.08);
-        }
-
-        /* Overlay background centered with backdrop blur */
-.distinct-img-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.65); /* Uniform dark overlay for centered text readability */
-    backdrop-filter: blur(3px); /* Glassmorphism touch */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Vertically center */
-    align-items: center;     /* Horizontally center */
-    text-align: center;
-    padding: 24px;
-    color: #ffffff;
-    opacity: 0;
-    transition: opacity 0.35s ease, backdrop-filter 0.35s ease;
-}
-
-.distinct-img-card:hover .distinct-img-overlay {
-    opacity: 1;
-}
-
-/* Modernized typography */
-.distinct-img-overlay h3 {
-    margin: 0;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.5;
-    letter-spacing: 0.8px;
-   
-    transform: translateY(12px) scale(0.96);
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    word-break: break-word;
-}
-
-.distinct-img-card:hover .distinct-img-overlay h3 {
-    transform: translateY(0) scale(1);
-}
     </style>
 </head>
 
@@ -243,6 +39,7 @@
 
 <c:choose>
 
+    <%-- RENDER ONLY DYNAMIC SECTIONS RETRIEVED FROM DATABASE --%>
     <c:when test="${not empty pageData and not empty pageData.sections}">
 
         <c:forEach
@@ -252,92 +49,94 @@
 
             <c:choose>
 
-                <%-- HERO SECTION: FULLSCREEN AUTOMATIC SLIDESHOW --%>
+                <%-- 1. HERO SECTION --%>
                 <c:when test="${fn:toLowerCase(sec.sectionType) eq 'hero'}">
 
-                    <div id="slideshow-${secLoop.index}" class="hero-fullscreen-container" data-autoplay="true" data-interval="4000">
+                    <section class="page-section section-hero">
+                        <div id="slideshow-${secLoop.index}" class="hero-fullscreen-container" data-autoplay="true" data-interval="4000">
 
-                        <c:choose>
+                            <c:choose>
 
-                            <c:when test="${not empty sec.images}">
+                                <c:when test="${not empty sec.images}">
 
-                                <c:forEach var="img" items="${sec.images}" varStatus="imgLoop">
+                                    <c:forEach var="img" items="${sec.images}" varStatus="imgLoop">
 
-                                    <div class="hero-slide ${imgLoop.first ? 'active' : ''}">
-                                        
-                                        <img
-                                            src="${pageContext.request.contextPath}/imageStream?id=${img.id}"
-                                            alt="${img.altText}"
-                                            onload="
-                                                this.nextElementSibling.querySelector('.status').innerText='LOAD SUCCESS';
-                                                this.nextElementSibling.querySelector('.status').style.color='#4EAE4E';
-                                            "
-                                            onerror="
-                                                this.nextElementSibling.querySelector('.status').innerText='LOAD FAILED';
-                                                this.nextElementSibling.querySelector('.status').style.color='#FF4D4D';
-                                            "
-                                        >
+                                        <div class="hero-slide ${imgLoop.first ? 'active' : ''}">
+                                            
+                                            <img
+                                                src="${pageContext.request.contextPath}/imageStream?id=${img.id}"
+                                                alt="${img.altText}"
+                                                onload="
+                                                    this.nextElementSibling.querySelector('.status').innerText='LOAD SUCCESS';
+                                                    this.nextElementSibling.querySelector('.status').style.color='#4EAE4E';
+                                                "
+                                                onerror="
+                                                    this.nextElementSibling.querySelector('.status').innerText='LOAD FAILED';
+                                                    this.nextElementSibling.querySelector('.status').style.color='#FF4D4D';
+                                                "
+                                            >
 
-                                        <div class="hero-slide-info">
-                                            <h3 style="margin:0 0 5px 0;"><c:out value="${sec.title}" /></h3>
-                                            <p style="margin:0 0 5px 0;">
-                                                <strong>Image ID:</strong> <c:out value="${img.id}" /> | 
-                                                <strong>Alt:</strong> <c:out value="${img.altText}" />
-                                            </p>
-                                            <div class="status" style="font-weight:bold;">Testing stream...</div>
+                                            <div class="hero-slide-info">
+                                                <h3><c:out value="${sec.title}" /></h3>
+                                                <p>
+                                                    <strong>Image ID:</strong> <c:out value="${img.id}" /> | 
+                                                    <strong>Alt:</strong> <c:out value="${img.altText}" />
+                                                </p>
+                                                <div class="status" style="font-weight:bold;">Testing stream...</div>
+                                            </div>
+
                                         </div>
 
+                                    </c:forEach>
+
+                                    <!-- Navigation Arrows -->
+                                    <c:if test="${fn:length(sec.images) > 1}">
+                                        <div class="hero-nav">
+                                            <button type="button" aria-label="Previous Slide" onclick="manualChangeSlide('slideshow-${secLoop.index}', -1)">&#10094;</button>
+                                            <button type="button" aria-label="Next Slide" onclick="manualChangeSlide('slideshow-${secLoop.index}', 1)">&#10095;</button>
+                                        </div>
+
+                                        <!-- Dots -->
+                                        <div class="hero-dots">
+                                            <c:forEach var="img" items="${sec.images}" varStatus="imgLoop">
+                                                <span class="dot ${imgLoop.first ? 'active' : ''}" onclick="manualGoToSlide('slideshow-${secLoop.index}', ${imgLoop.index})"></span>
+                                            </c:forEach>
+                                        </div>
+                                    </c:if>
+
+                                </c:when>
+
+                                <c:otherwise>
+                                    <div style="color:#ffffff; text-align:center; padding-top:20vh;">
+                                        <h3>Section: <c:out value="${sec.title}" /></h3>
+                                        <p style="color:var(--sec-brand-orange, #e06d38);">No images found in <code>section_images</code> for this Hero section ID.</p>
                                     </div>
+                                </c:otherwise>
 
-                                </c:forEach>
+                            </c:choose>
 
-                                <!-- Navigation Arrows -->
-                                <c:if test="${sec.images.size() > 1}">
-                                    <div class="hero-nav">
-                                        <button type="button" onclick="manualChangeSlide('slideshow-${secLoop.index}', -1)">&#10094;</button>
-                                        <button type="button" onclick="manualChangeSlide('slideshow-${secLoop.index}', 1)">&#10095;</button>
-                                    </div>
-
-                                    <!-- Dots -->
-                                    <div class="hero-dots">
-                                        <c:forEach var="img" items="${sec.images}" varStatus="imgLoop">
-                                            <span class="dot ${imgLoop.first ? 'active' : ''}" onclick="manualGoToSlide('slideshow-${secLoop.index}', ${imgLoop.index})"></span>
-                                        </c:forEach>
-                                    </div>
-                                </c:if>
-
-                            </c:when>
-
-                            <c:otherwise>
-                                <div style="color:white; text-align:center; padding-top:20vh;">
-                                    <h3>Section: <c:out value="${sec.title}" /></h3>
-                                    <p style="color:orange;">No images found in <code>section_images</code> for this Hero section ID.</p>
-                                </div>
-                            </c:otherwise>
-
-                        </c:choose>
-
-                    </div>
+                        </div>
+                    </section>
 
                 </c:when>
 
-                <%-- DISTINCT / DISTRICT SECTION: GRID WITH HOVER ALT TEXT & ACCENT BG --%>
+                <%-- 2. DISTINCT / DISTRICT SECTION --%>
                 <c:when test="${fn:toLowerCase(sec.sectionType) eq 'distinct' or fn:toLowerCase(sec.sectionType) eq 'district'}">
 
-                    <div class="distinct-section-wrapper">
+                    <section class="page-section section-distinct">
                         
                         <!-- Background Accent Box -->
                         <div class="distinct-accent-bg"></div>
 
                         <div class="distinct-grid">
 
-                            <!-- Top Left Text / Title Block -->
+                            <!-- Title Card Block -->
                             <div class="distinct-header-card">
                                 <h2><c:out value="${sec.title}" default="Distinctly SRS" /></h2>
                                 <p>Discover our school by navigating through our posts, blogs and news.</p>
                             </div>
 
-                            <!-- Dynamic Image Grid (Hover shows altText from DB) -->
+                            <!-- Dynamic Grid Cards -->
                             <c:choose>
                                 <c:when test="${not empty sec.images}">
                                     <c:forEach var="img" items="${sec.images}">
@@ -362,7 +161,7 @@
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <div class="distinct-img-card" style="grid-column: span 2; display:flex; align-items:center; justify-content:center; color:#fff;">
+                                    <div class="distinct-img-card" style="grid-column: span 2; display:flex; align-items:center; justify-content:center; color:#ffffff;">
                                         <p style="padding: 20px;">No images available for this section.</p>
                                     </div>
                                 </c:otherwise>
@@ -370,14 +169,47 @@
 
                         </div>
 
-                    </div>
+                    </section>
 
                 </c:when>
 
-                <%-- STANDARD SECTION: GRID DISPLAY --%>
+                <%-- 3. POPUP MODAL SECTION --%>
+                <c:when test="${fn:toLowerCase(sec.sectionType) eq 'popup_modal'}">
+
+                    <section id="modal-section-${secLoop.index}" class="page-section section-popup_modal">
+                        <div class="modal-content-card">
+                            <button type="button" class="modal-close-btn" onclick="closePopupModal('modal-section-${secLoop.index}')">&times;</button>
+                            
+                            <h2 style="margin-top:0; color: var(--sec-brand-dark);"><c:out value="${sec.title}" /></h2>
+                            
+                            <c:if test="${not empty sec.images}">
+                                <div style="margin: 15px 0;">
+                                    <c:forEach var="img" items="${sec.images}">
+                                        <img 
+                                            src="${pageContext.request.contextPath}/imageStream?id=${img.id}" 
+                                            alt="${img.altText}"
+                                            style="width: 100%; height: auto; border-radius: 6px; margin-bottom: 10px;"
+                                        >
+                                    </c:forEach>
+                                </div>
+                            </c:if>
+                            
+                            <div style="text-align: right; margin-top: 15px;">
+                                <button type="button" 
+                                        onclick="closePopupModal('modal-section-${secLoop.index}')"
+                                        style="background: var(--sec-brand-orange); color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                </c:when>
+
+                <%-- 4. FALLBACK FOR ANY OTHER CUSTOM SECTION TYPES --%>
                 <c:otherwise>
 
-                    <div class="diagnostic-container" style="margin-bottom:30px;">
+                    <section class="page-section section-default">
 
                         <h3>
                             Section #${secLoop.index + 1}:
@@ -385,17 +217,17 @@
                             (Type: <code><c:out value="${sec.sectionType}" /></code>)
                         </h3>
 
-                        <p>
+                        <p style="color: var(--sec-text-muted);">
                             Total Images linked to Section ID <strong><c:out value="${sec.id}" /></strong>:
-                            <strong><c:out value="${sec.images.size()}" default="0" /></strong>
+                            <strong><c:out value="${fn:length(sec.images)}" default="0" /></strong>
                         </p>
 
                         <c:choose>
                             <c:when test="${not empty sec.images}">
-                                <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                                <div class="default-grid">
                                     <c:forEach var="img" items="${sec.images}">
-                                        <div style="border:1px dashed #666; padding:10px;">
-                                            <p>
+                                        <div class="default-card">
+                                            <p style="margin: 0 0 8px 0; font-size: 13px;">
                                                 <strong>Image ID:</strong> <c:out value="${img.id}" /><br>
                                                 <strong>Type:</strong> <c:out value="${img.imageType}" /><br>
                                                 <strong>Alt:</strong> <c:out value="${img.altText}" />
@@ -403,29 +235,28 @@
                                             <img
                                                 src="${pageContext.request.contextPath}/imageStream?id=${img.id}"
                                                 alt="${img.altText}"
-                                                width="250"
                                                 onload="
                                                     this.nextElementSibling.innerText='LOAD SUCCESS';
-                                                    this.nextElementSibling.style.color='green';
+                                                    this.nextElementSibling.style.color='#4EAE4E';
                                                 "
                                                 onerror="
                                                     this.nextElementSibling.innerText='LOAD FAILED';
-                                                    this.nextElementSibling.style.color='red';
+                                                    this.nextElementSibling.style.color='#FF4D4D';
                                                 "
                                             >
-                                            <div style="font-weight:bold; margin-top:5px;">Testing stream...</div>
+                                            <div style="font-weight:bold; margin-top:6px; font-size: 12px;">Testing stream...</div>
                                         </div>
                                     </c:forEach>
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <p style="color:orange;">
+                                <p style="color:var(--sec-brand-orange);">
                                     No images found in <code>section_images</code> for this section ID.
                                 </p>
                             </c:otherwise>
                         </c:choose>
 
-                    </div>
+                    </section>
 
                 </c:otherwise>
 
@@ -437,152 +268,63 @@
 
     <c:otherwise>
 
-        <div class="diagnostic-container">
-            <p style="color:red; font-weight:bold;">
+        <section class="diagnostic-container">
+            <p style="color:#FF4D4D; font-weight:bold; margin:0;">
                 No sections found in pageData. Verify 'pages' table entry with slug='home'.
             </p>
-        </div>
+        </section>
 
     </c:otherwise>
 
 </c:choose>
 
-<hr>
+<!-- CONDITIONAL NEWS SECTION (ONLY RENDERS IF newsList IS NOT EMPTY) -->
+<c:if test="${not empty newsList}">
+    <hr style="border: none; border-top: 1px solid #e1e1e1; margin: 40px 0;">
 
-<!-- SECTION 3: NEWS IMAGES -->
-<div class="diagnostic-container">
-    <h2>3. News Section Images</h2>
+    <section class="diagnostic-container">
+        <h2 style="margin-top:0; color: var(--sec-brand-dark);">
+            <c:out value="${not empty pageData.sections ? fn:length(pageData.sections) + 1 : 1}" />. News Section Images
+        </h2>
 
-    <c:choose>
+        <div class="news-grid-container">
 
-        <c:when test="${not empty newsList}">
+            <c:forEach var="news" items="${newsList}">
 
-            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <div class="news-card">
 
-                <c:forEach var="news" items="${newsList}">
+                    <h4 style="margin:0 0 8px 0; font-size: 15px;"><c:out value="${news.title}" /></h4>
 
-                    <div style="border:1px solid #ccc; padding:10px; width:200px;">
+                    <p style="font-size:12px; color: var(--sec-text-muted); margin: 0 0 10px 0; word-break: break-all;">
+                        Path: <code><c:out value="${news.image}" /></code>
+                    </p>
 
-                        <h4><c:out value="${news.title}" /></h4>
+                    <img
+                        src="${pageContext.request.contextPath}/uploads/${news.image}"
+                        alt="News Image"
+                        onload="
+                            this.nextElementSibling.innerText='OK';
+                            this.nextElementSibling.style.color='#4EAE4E';
+                        "
+                        onerror="
+                            this.nextElementSibling.innerText='IMAGE NOT FOUND IN /uploads/';
+                            this.nextElementSibling.style.color='#FF4D4D';
+                        "
+                    >
 
-                        <p>Path: <code><c:out value="${news.image}" /></code></p>
+                    <div style="font-weight:bold; font-size: 12px; margin-top: 6px;">Testing...</div>
 
-                        <img
-                            src="${pageContext.request.contextPath}/uploads/${news.image}"
-                            alt="News Image"
-                            width="180"
-                            onload="
-                                this.nextElementSibling.innerText='OK';
-                                this.nextElementSibling.style.color='green';
-                            "
-                            onerror="
-                                this.nextElementSibling.innerText='IMAGE NOT FOUND IN /uploads/';
-                                this.nextElementSibling.style.color='red';
-                            "
-                        >
+                </div>
 
-                        <div>Testing...</div>
+            </c:forEach>
 
-                    </div>
+        </div>
+    </section>
+</c:if>
 
-                </c:forEach>
+<!-- External Section JavaScript -->
+<script src="${pageContext.request.contextPath}/js/sections.js"></script>
 
-            </div>
-
-        </c:when>
-
-        <c:otherwise>
-
-            <p>No news items fetched from DB.</p>
-
-        </c:otherwise>
-
-    </c:choose>
-</div>
-
-<!-- AUTOMATIC SLIDESHOW SCRIPT -->
-<script>
-    const autoPlayTimers = {};
-
-    function showSlide(container, index) {
-        const slides = container.querySelectorAll('.hero-slide');
-        const dots = container.querySelectorAll('.dot');
-        
-        if (slides.length === 0) return;
-
-        slides.forEach((slide, i) => {
-            slide.classList.toggle('active', i === index);
-        });
-
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
-        });
-    }
-
-    function nextSlide(containerId) {
-        const container = document.getElementById(containerId);
-        const slides = container.querySelectorAll('.hero-slide');
-        let currentIndex = -1;
-
-        slides.forEach((slide, index) => {
-            if (slide.classList.contains('active')) {
-                currentIndex = index;
-            }
-        });
-
-        let newIndex = (currentIndex + 1) % slides.length;
-        showSlide(container, newIndex);
-    }
-
-    function manualChangeSlide(containerId, step) {
-        const container = document.getElementById(containerId);
-        const slides = container.querySelectorAll('.hero-slide');
-        let currentIndex = -1;
-
-        slides.forEach((slide, index) => {
-            if (slide.classList.contains('active')) {
-                currentIndex = index;
-            }
-        });
-
-        let newIndex = currentIndex + step;
-        if (newIndex >= slides.length) newIndex = 0;
-        if (newIndex < 0) newIndex = slides.length - 1;
-
-        showSlide(container, newIndex);
-        resetAutoplay(containerId);
-    }
-
-    function manualGoToSlide(containerId, index) {
-        const container = document.getElementById(containerId);
-        showSlide(container, index);
-        resetAutoplay(containerId);
-    }
-
-    function startAutoplay(containerId, interval) {
-        autoPlayTimers[containerId] = setInterval(() => {
-            nextSlide(containerId);
-        }, interval);
-    }
-
-    function resetAutoplay(containerId) {
-        const container = document.getElementById(containerId);
-        const interval = parseInt(container.getAttribute('data-interval')) || 4000;
-        
-        if (autoPlayTimers[containerId]) {
-            clearInterval(autoPlayTimers[containerId]);
-        }
-        startAutoplay(containerId, interval);
-    }
-
-    // Initialize Autoplay on page load
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll('.hero-fullscreen-container[data-autoplay="true"]').forEach(container => {
-            const interval = parseInt(container.getAttribute('data-interval')) || 4000;
-            startAutoplay(container.id, interval);
-        });
-    });
-</script>
 <%@ include file="Footer.jsp" %>
 </body>
 </html>
