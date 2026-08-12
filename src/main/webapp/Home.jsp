@@ -196,61 +196,44 @@
             transform: scale(1.08);
         }
 
-        /* Overlay hidden by default, revealed on hover */
-        .distinct-img-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 20px;
-            color: #fff;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
+        /* Overlay background centered with backdrop blur */
+.distinct-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65); /* Uniform dark overlay for centered text readability */
+    backdrop-filter: blur(3px); /* Glassmorphism touch */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center */
+    align-items: center;     /* Horizontally center */
+    text-align: center;
+    padding: 24px;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.35s ease, backdrop-filter 0.35s ease;
+}
 
-        .distinct-img-card:hover .distinct-img-overlay {
-            opacity: 1;
-        }
+.distinct-img-card:hover .distinct-img-overlay {
+    opacity: 1;
+}
 
-        .distinct-img-overlay h3 {
-            margin: 0;
-            font-family: Calibri, Arial, sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.4; /* Adds clean spacing when text wraps to 2 lines */
-            letter-spacing: 0.3px;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9);
-            transform: translateY(10px);
-            transition: transform 0.3s ease-in-out;
-            word-wrap: break-word;
-        }
+/* Modernized typography */
+.distinct-img-overlay h3 {
+    margin: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.8px;
+   
+    transform: translateY(12px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    word-break: break-word;
+}
 
-        .distinct-img-card:hover .distinct-img-overlay h3 {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 900px) {
-            .distinct-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .distinct-header-card {
-                grid-column: span 2;
-            }
-            .distinct-accent-bg {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .distinct-grid {
-                grid-template-columns: 1fr;
-            }
-            .distinct-header-card {
-                grid-column: span 1;
-            }
-        }
+.distinct-img-card:hover .distinct-img-overlay h3 {
+    transform: translateY(0) scale(1);
+}
     </style>
 </head>
 
@@ -600,6 +583,6 @@
         });
     });
 </script>
-
+<%@ include file="Footer.jsp" %>
 </body>
 </html>
