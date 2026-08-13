@@ -30,12 +30,12 @@ public class PageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
         HttpSession sess = req.getSession(false);
         if (sess == null || sess.getAttribute("username") == null) {
             resp.sendRedirect("login.jsp");
             return;
         }
+
         String branch = (String) sess.getAttribute("branch");
         String role = (String) sess.getAttribute("role");
         if (!isAuthorized(role)) {
@@ -66,13 +66,6 @@ public class PageServlet extends HttpServlet {
                 case "deleteImage":
                     deleteImage(conn, Long.parseLong(req.getParameter("imageId")));
                     resp.sendRedirect("pages?action=view&id=" + req.getParameter("pageId"));
-                    break;
-
-                case "edit":
-                    Long editId = Long.parseLong(req.getParameter("id"));
-                    req.setAttribute("activePage", getPageDetails(conn, editId));
-                    req.setAttribute("pages", getAllPages(conn));
-                    req.getRequestDispatcher("/edit-page.jsp").forward(req, resp);
                     break;
 
                 case "view":
@@ -161,7 +154,6 @@ public class PageServlet extends HttpServlet {
                         saveImageToDb(conn, sectionId, inputStream, contentType, alt, order, heading1, heading2);
                     }
                 }
-
                 resp.sendRedirect("pages?action=view&id=" + pageId);
 
             } else if ("updateImage".equals(action)) {
@@ -181,7 +173,6 @@ public class PageServlet extends HttpServlet {
                 } else {
                     updateImageMetadata(conn, imageId, alt, order, heading1, heading2);
                 }
-
                 resp.sendRedirect("pages?action=view&id=" + pageId);
             }
         } catch (SQLException e) {
@@ -195,7 +186,6 @@ public class PageServlet extends HttpServlet {
                 || "Admin".equalsIgnoreCase(role);
     }
 
-    // Streams raw image BLOB directly from database to client browser
     private void renderImageFromDb(Connection conn, Long imageId, HttpServletResponse resp) throws SQLException, IOException {
         String sql = "SELECT image_data, image_type FROM section_images WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -257,8 +247,6 @@ public class PageServlet extends HttpServlet {
             ps.executeUpdate();
         }
     }
-
-    // --- Helper Database Queries ---
 
     private List<PageBean> getAllPages(Connection conn) throws SQLException {
         List<PageBean> list = new ArrayList<>();
