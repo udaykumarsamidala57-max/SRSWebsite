@@ -1,5 +1,6 @@
 package com.bean;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,9 +8,8 @@ public class PageBean {
     private Long id;
     private String title;
     private String slug;
+    private List<PageBean> children = new ArrayList<>();
     private List<Section> sections = new ArrayList<>();
-
-    public PageBean() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -20,10 +20,14 @@ public class PageBean {
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
 
+    // Required by Home.jsp line 271 (${pg.children}) to prevent Jasper errors
+    public List<PageBean> getChildren() { return children; }
+    public void setChildren(List<PageBean> children) { this.children = children; }
+
     public List<Section> getSections() { return sections; }
     public void setSections(List<Section> sections) { this.sections = sections; }
 
-    // --- Inner Class: Section ---
+    // Nested Class: Section
     public static class Section {
         private Long id;
         private Long pageId;
@@ -32,8 +36,6 @@ public class PageBean {
         private String title;
         private String content;
         private List<SectionImage> images = new ArrayList<>();
-
-        public Section() {}
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -57,7 +59,7 @@ public class PageBean {
         public void setImages(List<SectionImage> images) { this.images = images; }
     }
 
-    // --- Inner Class: SectionImage ---
+    // Nested Class: SectionImage
     public static class SectionImage {
         private Long id;
         private Long sectionId;
@@ -65,8 +67,9 @@ public class PageBean {
         private String imageType;
         private String altText;
         private Integer sequenceOrder;
-
-        public SectionImage() {}
+        private Timestamp createdAt;
+        private String heading1;
+        private String heading2;
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -85,5 +88,14 @@ public class PageBean {
 
         public Integer getSequenceOrder() { return sequenceOrder; }
         public void setSequenceOrder(Integer sequenceOrder) { this.sequenceOrder = sequenceOrder; }
+
+        public Timestamp getCreatedAt() { return createdAt; }
+        public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+
+        public String getHeading1() { return heading1; }
+        public void setHeading1(String heading1) { this.heading1 = heading1; }
+
+        public String getHeading2() { return heading2; }
+        public void setHeading2(String heading2) { this.heading2 = heading2; }
     }
 }

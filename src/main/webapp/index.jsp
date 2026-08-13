@@ -1,5 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%
+    HttpSession sess = request.getSession(false);
+    if (sess == null || sess.getAttribute("username") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    String user   = (String) sess.getAttribute("username");
+    String role   = (String) sess.getAttribute("role");
+    String dept   = (String) sess.getAttribute("department");
+    String branch = (String) sess.getAttribute("branch");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,372 +22,134 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- External CSS -->
+    <link rel="stylesheet" href="css/page.css">
+    
     <style>
-        :root {
-            --slds-navy: #0176D3;
-            --slds-navy-dark: #005FB2;
-            --slds-bg-main: #B0C4DF;
-            --slds-bg-page: #F3F3F3;
-            --slds-card-bg: #FFFFFF;
-            --slds-border: #DDDBDA;
-            --slds-text-primary: #181818;
-            --slds-text-secondary: #444444;
-            --slds-text-muted: #747474;
-            --slds-danger: #BA0517;
-            --slds-danger-bg: #FEF1F1;
-            --slds-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
-            --slds-radius: 4px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--slds-bg-page);
-            color: var(--slds-text-primary);
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        /* Top Header Navigation */
+        /* Header Layout Updates */
         .app-header {
-            background-color: #001639;
-            color: #FFFFFF;
-            padding: 12px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            padding: 1rem 2rem;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
         }
-
-        .app-header h1 {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        .header-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 1rem;
         }
-
-        .app-header h1::before {
-            content: '';
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: var(--slds-navy);
-            border-radius: 2px;
+        .header-brand h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #0f172a;
         }
-
-        .app-container {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 20px;
-            padding: 24px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* Cards & Containers */
-        .card {
-            background: var(--slds-card-bg);
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            box-shadow: var(--slds-shadow);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--slds-border);
-            background-color: #FAFAFB;
+        .user-nav {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 1rem;
         }
-
-        .card-header h3, .card-header h2 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--slds-text-primary);
+        .user-info {
+            font-size: 0.875rem;
+            color: #475569;
         }
-
-        .card-body {
-            padding: 16px;
-        }
-
-        /* Forms & Inputs */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--slds-text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 6px 10px;
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            font-family: inherit;
-            font-size: 13px;
-            color: var(--slds-text-primary);
-            background-color: #FFFFFF;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--slds-navy);
-            box-shadow: 0 0 0 1px var(--slds-navy);
-        }
-
-        textarea {
-            resize: vertical;
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: var(--slds-radius);
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.15s ease;
+        .btn-logout {
+            background-color: #ef4444;
+            color: #ffffff;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
             text-decoration: none;
-            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-logout:hover {
+            background-color: #dc2626;
         }
 
-        .btn-brand {
-            background-color: var(--slds-navy);
-            color: #FFFFFF;
-            border-color: var(--slds-navy);
-        }
-
-        .btn-brand:hover {
-            background-color: var(--slds-navy-dark);
-            border-color: var(--slds-navy-dark);
-        }
-
-        .btn-neutral {
-            background-color: #FFFFFF;
-            color: var(--slds-navy);
-            border-color: var(--slds-border);
-        }
-
-        .btn-neutral:hover {
-            background-color: #F3F3F3;
-        }
-
-        .btn-destructive {
-            color: var(--slds-danger);
-            background-color: transparent;
-        }
-
-        .btn-destructive:hover {
-            background-color: var(--slds-danger-bg);
-        }
-
-        .btn-sm {
-            padding: 3px 8px;
-            font-size: 11px;
-        }
-
-        /* Tables */
-        .slds-table-container {
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            overflow: hidden;
-            margin-top: 12px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            background: #FFFFFF;
-        }
-
-        th {
-            background-color: #FAFAFB;
-            color: var(--slds-text-secondary);
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--slds-border);
-        }
-
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--slds-border);
-            vertical-align: middle;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: #F3F3F3;
-        }
-
-        /* Badges & Tags */
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            border-radius: 2px;
-            background-color: #EAF4FE;
-            color: var(--slds-navy-dark);
-            border: 1px solid #C2E0FF;
-        }
-
-        .badge-type {
-            background-color: #ECEBEA;
-            color: var(--slds-text-primary);
-            border-color: var(--slds-border);
-        }
-
-        /* Code Pill */
-        code.slug-pill {
-            font-family: monospace;
-            background: #F3F3F3;
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: var(--slds-text-muted);
-            font-size: 11px;
-        }
-
-        /* Section Block */
-        .section-card {
-            border: 1px solid var(--slds-border);
-            border-left: 4px solid var(--slds-navy);
-            border-radius: var(--slds-radius);
-            background: #FFFFFF;
-            margin-bottom: 16px;
-            box-shadow: var(--slds-shadow);
-        }
-
-        .section-header {
-            padding: 12px 16px;
-            background-color: #FAFAFB;
-            border-bottom: 1px solid var(--slds-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .section-body {
-            padding: 16px;
-        }
-
-        /* Image Gallery Grid */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 12px;
-            margin: 12px 0;
-        }
-
-        .img-card {
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            padding: 8px;
-            background: #FFFFFF;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            transition: box-shadow 0.15s ease;
-        }
-
-        .img-card:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .img-container {
-            height: 90px;
-            display: flex;
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 999;
             align-items: center;
             justify-content: center;
-            background: #FAFAFB;
-            border-radius: 2px;
-            margin-bottom: 6px;
+        }
+        .modal-backdrop.active { display: flex; }
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 580px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             overflow: hidden;
+            animation: modalFadeIn 0.2s ease-out;
         }
-
-        .img-card img {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
         }
-
-        .img-meta {
-            font-size: 11px;
-            color: var(--slds-text-muted);
-            margin-bottom: 4px;
-            word-break: break-word;
-        }
-
-        .nested-form-block {
-            background-color: #FAFAFB;
-            border: 1px dashed var(--slds-border);
-            padding: 12px;
-            border-radius: var(--slds-radius);
-            margin-top: 12px;
-        }
-
-        .empty-state {
-            padding: 40px;
-            text-align: center;
-            color: var(--slds-text-muted);
-        }
-
-        /* Action Links Group */
-        .action-group {
+        .modal-header {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
-            gap: 6px;
             align-items: center;
+            justify-content: space-between;
         }
+        .modal-header h3 { margin: 0; font-size: 1.1rem; color: #0f172a; }
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .action-group { display: flex; gap: 0.35rem; }
+        .img-headings {
+            padding: 4px 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+        .img-headings strong { color: #0f172a; }
+        .img-headings em { color: #64748b; display: block; }
     </style>
 </head>
 <body>
 
-    <!-- LIGHTNING HEADER NAV -->
+    <!-- LIGHTNING HEADER NAV WITH USER BRANCH & LOGOUT -->
     <header class="app-header">
-        <h1>Dynamic Page Manager</h1>
-        <span style="font-size: 11px; color: #B0C4DF; font-weight: 500;">Content Builder v2.4</span>
+        <div class="header-brand">
+            <h1>Dynamic Page Builder</h1>
+        </div>
+        <div class="user-nav">
+            <span class="user-info">
+                Logged in as <strong><%= user %></strong> (<%= role %>)
+                <% if (branch != null && !branch.trim().isEmpty()) { %>
+                    | Branch: <strong><%= branch %></strong>
+                <% } %>
+            </span>
+            <a href="Logout.jsp" class="btn-logout">Logout</a>
+        </div>
     </header>
 
     <div class="app-container">
@@ -402,7 +176,7 @@
                             <input type="text" id="slug" name="slug" required placeholder="e.g. home">
                         </div>
                         
-                        <button type="submit" class="btn btn-brand" style="width: 100%; margin-top: 4px;">+ Create Page</button>
+                        <button type="submit" class="btn btn-brand btn-submit-spaced">+ Create Page</button>
                     </form>
                 </div>
             </div>
@@ -412,24 +186,29 @@
                 <div class="card-header">
                     <h3>Pages Directory</h3>
                 </div>
-                <div class="card-body" style="padding: 0;">
-                    <div class="slds-table-container" style="border: none; margin-top: 0;">
+                <div class="card-body no-padding">
+                    <div class="slds-table-container directory-table">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Page details</th>
-                                    <th style="text-align: right;">Action</th>
+                                    <th class="align-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:forEach var="p" items="${pages}">
                                     <tr>
                                         <td>
-                                            <strong style="color: var(--slds-text-primary);">${p.title}</strong><br>
+                                            <strong class="page-title">${p.title}</strong><br>
                                             <code class="slug-pill">/${p.slug}</code>
                                         </td>
-                                        <td style="text-align: right;">
-                                            <div class="action-group" style="justify-content: flex-end;">
+                                        <td class="align-right">
+                                            <div class="action-group">
+                                                <button type="button" 
+                                                        class="btn btn-neutral btn-sm" 
+                                                        onclick="openEditPageModal('${p.id}', '${fn:escapeXml(p.title)}', '${fn:escapeXml(p.slug)}')">
+                                                    Edit
+                                                </button>
                                                 <a href="pages?action=view&id=${p.id}" class="btn btn-neutral btn-sm">Manage</a>
                                                 <a href="pages?action=delete&id=${p.id}" onclick="return confirm('Delete page?')" class="btn btn-destructive btn-sm">Delete</a>
                                             </div>
@@ -452,20 +231,27 @@
                     <!-- ACTIVE PAGE CONTROL BAR -->
                     <div class="card">
                         <div class="card-header">
-                            <h2>Editing Page: <span style="color: var(--slds-navy);">${activePage.title}</span></h2>
-                            <code class="slug-pill">Path: /${activePage.slug}</code>
+                            <div>
+                                <h2>Editing Page: <span class="card-header-title">${activePage.title}</span></h2>
+                                <code class="slug-pill">Path: /${activePage.slug}</code>
+                            </div>
+                            <button type="button" 
+                                    class="btn btn-neutral btn-sm"
+                                    onclick="openEditPageModal('${activePage.id}', '${fn:escapeXml(activePage.title)}', '${fn:escapeXml(activePage.slug)}')">
+                                Edit Page Details
+                            </button>
                         </div>
                         <div class="card-body">
                             
                             <!-- ADD SECTION FORM -->
-                            <div class="nested-form-block" style="background-color: #FFFFFF; border-style: solid;">
-                                <h4 style="margin-bottom: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--slds-text-muted);">Add New Section</h4>
+                            <div class="nested-form-block solid-border">
+                                <h4 class="sub-header form-heading">Add New Section</h4>
                                 <form action="pages" method="post">
                                     <input type="hidden" name="action" value="addSection">
                                     <input type="hidden" name="pageId" value="${activePage.id}">
                                     
                                     <div class="form-row">
-                                        <div style="flex: 1; min-width: 140px;">
+                                        <div class="col-type">
                                             <label>Type</label>
                                             <select name="sectionType">
                                                 <option value="hero">Hero</option>
@@ -474,18 +260,18 @@
                                             </select>
                                         </div>
 
-                                        <div style="width: 80px;">
+                                        <div class="col-seq-sm">
                                             <label>Sequence</label>
                                             <input type="number" name="sequenceOrder" value="1" min="1" required>
                                         </div>
 
-                                        <div style="flex: 2; min-width: 200px;">
+                                        <div class="col-title">
                                             <label>Section Title</label>
                                             <input type="text" name="title" placeholder="Enter title">
                                         </div>
                                     </div>
 
-                                    <div class="form-group" style="margin-top: 10px; margin-bottom: 10px;">
+                                    <div class="form-group spacing-vertical">
                                         <label>Content Description</label>
                                         <textarea name="content" rows="2" placeholder="Write section body content..."></textarea>
                                     </div>
@@ -501,30 +287,44 @@
                     <c:forEach var="sec" items="${activePage.sections}">
                         <div class="section-card">
                             <div class="section-header">
-                                <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="section-title-group">
                                     <span class="badge">#${sec.sequenceOrder}</span>
                                     <span class="badge badge-type">${sec.sectionType.toUpperCase()}</span>
-                                    <strong style="font-size: 13px;">${sec.title}</strong>
+                                    <strong class="section-title-text">${sec.title}</strong>
                                 </div>
-                                <a href="pages?action=deleteSection&sectionId=${sec.id}&pageId=${activePage.id}" 
-                                   class="btn btn-destructive btn-sm"
-                                   onclick="return confirm('Delete Section?')">Remove Section</a>
+                                <div class="action-group">
+                                    <button type="button" 
+                                            class="btn btn-neutral btn-sm"
+                                            onclick="openEditSectionModal('${sec.id}', '${sec.sectionType}', '${sec.sequenceOrder}', '${fn:escapeXml(sec.title)}', '${fn:escapeXml(sec.content)}')">
+                                        Edit Section
+                                    </button>
+                                    <a href="pages?action=deleteSection&sectionId=${sec.id}&pageId=${activePage.id}" 
+                                       class="btn btn-destructive btn-sm"
+                                       onclick="return confirm('Delete Section?')">Remove Section</a>
+                                </div>
                             </div>
 
                             <div class="section-body">
-                                <p style="color: var(--slds-text-secondary); margin-bottom: 14px;">${sec.content}</p>
+                                <p class="section-description">${sec.content}</p>
 
                                 <!-- IMAGES GALLERY HEADER -->
-                                <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--slds-text-muted); margin-bottom: 8px;">Sequenced Assets</h4>
+                                <h4 class="sub-header">Sequenced Assets</h4>
                                 
                                 <div class="gallery-grid">
                                     <c:forEach var="img" items="${sec.images}">
                                         <div class="img-card">
-                                            <span class="badge" style="position: absolute; top: 4px; left: 4px; font-size: 9px;">Seq ${img.sequenceOrder}</span>
+                                            <span class="badge badge-overlay">Seq ${img.sequenceOrder}</span>
                                             
                                             <div class="img-container">
                                                 <img src="pages?action=renderImage&imageId=${img.id}" alt="${img.altText}">
                                             </div>
+
+                                            <c:if test="${not empty img.heading1 or not empty img.heading2}">
+                                                <div class="img-headings">
+                                                    <c:if test="${not empty img.heading1}"><strong>H1: ${img.heading1}</strong></c:if>
+                                                    <c:if test="${not empty img.heading2}"><em>H2: ${img.heading2}</em></c:if>
+                                                </div>
+                                            </c:if>
                                             
                                             <div class="img-meta" title="${img.altText}">
                                                 <c:choose>
@@ -533,7 +333,16 @@
                                                 </c:choose>
                                             </div>
                                             
-                                            <a href="pages?action=deleteImage&imageId=${img.id}&pageId=${activePage.id}" class="btn btn-destructive btn-sm" style="width: 100%;">Delete</a>
+                                            <div class="action-group">
+                                                <button type="button" 
+                                                        class="btn btn-neutral btn-sm btn-full"
+                                                        onclick="openEditImageModal('${img.id}', '${img.sequenceOrder}', '${fn:escapeXml(img.altText)}', '${fn:escapeXml(img.heading1)}', '${fn:escapeXml(img.heading2)}')">
+                                                    Edit Asset
+                                                </button>
+                                                <a href="pages?action=deleteImage&imageId=${img.id}&pageId=${activePage.id}" 
+                                                   class="btn btn-destructive btn-sm btn-full"
+                                                   onclick="return confirm('Delete asset?')">Delete</a>
+                                            </div>
                                         </div>
                                     </c:forEach>
                                 </div>
@@ -545,19 +354,31 @@
                                         <input type="hidden" name="sectionId" value="${sec.id}">
                                         
                                         <div class="form-row">
-                                            <div style="flex: 2; min-width: 180px;">
+                                            <div class="col-file">
                                                 <label>Select File</label>
-                                                <input type="file" name="imageFile" accept="image/*" required style="background: transparent; border: none; padding: 0;">
+                                                <input type="file" name="imageFile" accept="image/*" required>
                                             </div>
-                                            <div style="flex: 2; min-width: 150px;">
-                                                <label>Alt Text</label>
+                                            <div class="col-alt">
+                                                <label>Heading 1</label>
+                                                <input type="text" name="heading1" placeholder="Main Heading">
+                                            </div>
+                                            <div class="col-alt">
+                                                <label>Heading 2</label>
+                                                <input type="text" name="heading2" placeholder="Sub Heading">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row spacing-vertical">
+                                            <div class="col-alt">
+                                                <label>Alt Text / Description</label>
                                                 <input type="text" name="altText" placeholder="Image description">
                                             </div>
-                                            <div style="width: 70px;">
+                                            <div class="col-seq-xs">
                                                 <label>Seq #</label>
                                                 <input type="number" name="sequenceOrder" value="1" min="1" required>
                                             </div>
                                             <div>
+                                                <label>&nbsp;</label>
                                                 <button type="submit" class="btn btn-neutral">Upload Asset</button>
                                             </div>
                                         </div>
@@ -573,7 +394,7 @@
                 <c:otherwise>
                     <div class="card">
                         <div class="empty-state">
-                            <h3 style="margin-bottom: 6px; color: var(--slds-text-primary);">No Page Selected</h3>
+                            <h3>No Page Selected</h3>
                             <p>Select a page from the directory sidebar on the left to configure dynamic layout sections and media items.</p>
                         </div>
                     </div>
@@ -583,5 +404,167 @@
 
     </div>
 
+    <!-- EDIT PAGE MODAL -->
+    <div class="modal-backdrop" id="editPageModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Edit Page Details</h3>
+                <button type="button" class="modal-close" onclick="closeModal('editPageModal')">&times;</button>
+            </div>
+            <form action="pages" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="editPage">
+                    <input type="hidden" name="pageId" id="modalPageId">
+
+                    <div class="form-group">
+                        <label for="modalPageTitle">Page Title</label>
+                        <input type="text" name="title" id="modalPageTitle" required>
+                    </div>
+
+                    <div class="form-group spacing-vertical">
+                        <label for="modalPageSlug">URL Slug</label>
+                        <input type="text" name="slug" id="modalPageSlug" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-neutral" onclick="closeModal('editPageModal')">Cancel</button>
+                    <button type="submit" class="btn btn-brand">Save Page</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT SECTION MODAL -->
+    <div class="modal-backdrop" id="editSectionModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Edit Section Block</h3>
+                <button type="button" class="modal-close" onclick="closeModal('editSectionModal')">&times;</button>
+            </div>
+            <form action="pages" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="updateSection">
+                    <input type="hidden" name="pageId" value="${activePage.id}">
+                    <input type="hidden" name="sectionId" id="modalSectionId">
+
+                    <div class="form-row">
+                        <div class="col-type">
+                            <label>Type</label>
+                            <select name="sectionType" id="modalSectionType">
+                                <option value="hero">Hero</option>
+                                <option value="district">District</option>
+                                <option value="popup_modal">Pop-up Modal</option>
+                            </select>
+                        </div>
+
+                        <div class="col-seq-sm">
+                            <label>Sequence</label>
+                            <input type="number" name="sequenceOrder" id="modalSectionSequence" min="1" required>
+                        </div>
+
+                        <div class="col-title">
+                            <label>Section Title</label>
+                            <input type="text" name="title" id="modalSectionTitle">
+                        </div>
+                    </div>
+
+                    <div class="form-group spacing-vertical">
+                        <label>Content Description</label>
+                        <textarea name="content" id="modalSectionContent" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-neutral" onclick="closeModal('editSectionModal')">Cancel</button>
+                    <button type="submit" class="btn btn-brand">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT IMAGE / MEDIA MODAL -->
+    <div class="modal-backdrop" id="editImageModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Edit Asset Metadata & Headings</h3>
+                <button type="button" class="modal-close" onclick="closeModal('editImageModal')">&times;</button>
+            </div>
+            <form action="pages?action=updateImage" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="pageId" value="${activePage.id}">
+                    <input type="hidden" name="imageId" id="modalImageId">
+
+                    <div class="form-group">
+                        <label>Replace Image (Optional)</label>
+                        <input type="file" name="imageFile" accept="image/*">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-alt">
+                            <label>Heading 1</label>
+                            <input type="text" name="heading1" id="modalImageHeading1">
+                        </div>
+                        <div class="col-alt">
+                            <label>Heading 2</label>
+                            <input type="text" name="heading2" id="modalImageHeading2">
+                        </div>
+                    </div>
+
+                    <div class="form-row spacing-vertical">
+                        <div class="col-alt">
+                            <label>Alt Text / Description</label>
+                            <input type="text" name="altText" id="modalImageAltText">
+                        </div>
+                        <div class="col-seq-xs">
+                            <label>Seq #</label>
+                            <input type="number" name="sequenceOrder" id="modalImageSequence" min="1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-neutral" onclick="closeModal('editImageModal')">Cancel</button>
+                    <button type="submit" class="btn btn-brand">Update Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL JS LOGIC -->
+    <script>
+        function openEditPageModal(pageId, title, slug) {
+            document.getElementById('modalPageId').value = pageId;
+            document.getElementById('modalPageTitle').value = title;
+            document.getElementById('modalPageSlug').value = slug;
+            document.getElementById('editPageModal').classList.add('active');
+        }
+
+        function openEditSectionModal(id, type, sequence, title, content) {
+            document.getElementById('modalSectionId').value = id;
+            document.getElementById('modalSectionType').value = type;
+            document.getElementById('modalSectionSequence').value = sequence;
+            document.getElementById('modalSectionTitle').value = title;
+            document.getElementById('modalSectionContent').value = content;
+            document.getElementById('editSectionModal').classList.add('active');
+        }
+
+        function openEditImageModal(imageId, sequence, altText, heading1, heading2) {
+            document.getElementById('modalImageId').value = imageId;
+            document.getElementById('modalImageSequence').value = sequence;
+            document.getElementById('modalImageAltText').value = altText || '';
+            document.getElementById('modalImageHeading1').value = heading1 || '';
+            document.getElementById('modalImageHeading2').value = heading2 || '';
+            document.getElementById('editImageModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modal when clicking outside of card
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-backdrop')) {
+                event.target.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

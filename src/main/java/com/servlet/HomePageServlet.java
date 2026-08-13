@@ -26,14 +26,14 @@ public class HomePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-
+    	
         PageBean pageBean = new PageBean();
         String pageSlug = "home";
 
         List<Map<String, Object>> newsList = new ArrayList<>();
         List<Map<String, Object>> eventList = new ArrayList<>();
 
-        try (Connection conn = DBUtil.getConnection()) {
+        try (Connection conn = DBUtil.getConnection("SRS")) {
             
             // 1. Fetch Page Data
             String pageSql = "SELECT id, title, slug FROM pages WHERE slug = ?";
