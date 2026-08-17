@@ -119,17 +119,18 @@
         }
 
         /* Main Workspace Grid */
-        .app-container {
-            display: grid;
-            grid-template-columns: 310px 1fr 240px;
-            gap: 1.25rem;
-            padding: 1.25rem;
-            max-width: 1720px;
-            margin: 0 auto;
-        }
+       .app-container {
+    display: grid;
+    /* Allows the sidebar to grow naturally between 320px and 400px before allocating space to the main content */
+    grid-template-columns: minmax(320px, 400px) 1fr 240px;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    max-width: 1720px;
+    margin: 0 auto;
+}
 
         @media (max-width: 1300px) {
-            .app-container { grid-template-columns: 290px 1fr; }
+            .app-container { grid-template-columns: 300px 1fr; }
             .page-nav-sidebar { display: none; }
         }
 
@@ -159,11 +160,11 @@
 
         .slds-card-header h3 {
             margin: 0;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--slds-text-primary);
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
         }
 
         .slds-card-body { padding: 1rem; }
@@ -207,8 +208,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.4rem 0.85rem;
-            font-size: 0.8rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.775rem;
             font-weight: 600;
             border-radius: var(--slds-radius);
             border: 1px solid transparent;
@@ -216,6 +217,7 @@
             text-decoration: none;
             transition: all 0.15s ease-in-out;
             gap: 0.35rem;
+            line-height: 1.2;
         }
 
         .btn-brand {
@@ -245,30 +247,73 @@
             border-color: var(--slds-destructive);
         }
 
-        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+        .btn-sm { padding: 0.25rem 0.45rem; font-size: 0.725rem; }
         .btn-full { width: 100%; }
 
-        /* Tables */
+        /* Modernized Directory Table */
+        .directory-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
         .directory-table table {
             width: 100%;
             border-collapse: collapse;
-        }
-
-        .directory-table th {
-            padding: 0.55rem 0.85rem;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--slds-text-weak);
-            background: #fafafa;
-            border-bottom: 1px solid var(--slds-border);
             text-align: left;
         }
 
+        .directory-table th {
+            padding: 0.6rem 0.75rem;
+            font-size: 0.685rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--slds-text-weak);
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--slds-border);
+        }
+
         .directory-table td {
-            padding: 0.65rem 0.85rem;
+            padding: 0.65rem 0.75rem;
             border-bottom: 1px solid var(--slds-border-subtle);
-            font-size: 0.825rem;
+            font-size: 0.8rem;
+            vertical-align: middle;
+        }
+
+        .directory-table tr:hover {
+            background-color: #fbfbfd;
+        }
+
+        /* Parent/Child Alignment Rules */
+        .page-title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .page-name {
+            font-weight: 600;
+            color: var(--slds-text-primary);
+            line-height: 1.25;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .sub-page-row {
+            background-color: #fafafa;
+        }
+
+        .sub-page-cell {
+            padding-left: 1.25rem !important;
+            border-left: 3px solid var(--slds-brand);
+        }
+
+        .tree-connector {
+            color: var(--slds-brand);
+            font-weight: 700;
+            font-size: 0.85rem;
+            user-select: none;
         }
 
         .slug-pill {
@@ -277,9 +322,30 @@
             background: #eef4fe;
             color: var(--slds-brand);
             border-radius: var(--slds-radius);
-            font-family: monospace;
-            font-size: 0.725rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.7rem;
             font-weight: 600;
+            width: fit-content;
+        }
+
+        .badge-nav-root {
+            background: #e1f5fe;
+            color: #0288d1;
+            font-size: 0.625rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 2px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-nav-sub {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            font-size: 0.625rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 2px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         /* Active Page Workspace */
@@ -495,7 +561,7 @@
             display: flex; justify-content: flex-end; gap: 0.5rem;
         }
         
-        .action-group { display: flex; gap: 0.35rem; }
+        .action-group { display: flex; gap: 0.25rem; }
         .align-right { text-align: right; }
         .sub-header { margin: 0 0 0.75rem 0; font-size: 0.8rem; font-weight: 700; color: var(--slds-text-primary); text-transform: uppercase; }
         .hidden-content-store { display: none; }
@@ -542,11 +608,23 @@
                             <label for="slug">URL Slug</label>
                             <input type="text" id="slug" name="slug" required placeholder="e.g. home">
                         </div>
+                        <div class="form-group">
+                            <label for="parentId">Parent Page (Sub-Navigation)</label>
+                            <select id="parentId" name="parentId">
+                                <option value="">-- None (Top Level Menu) --</option>
+                                <c:forEach var="p" items="${pages}">
+                                    <c:if test="${empty p.parentId}">
+                                        <option value="${p.id}">${fn:escapeXml(p.title)}</option>
+                                    </c:if>
+                                </c:forEach>
+                            </select>
+                        </div>
                         <button type="submit" class="btn btn-brand btn-full" style="margin-top:0.35rem;">+ Create Page</button>
                     </form>
                 </div>
             </div>
 
+            <!-- PROFESSIONALLY ALIGNED PAGES DIRECTORY -->
             <div class="slds-card">
                 <div class="slds-card-header">
                     <h3>Pages Directory</h3>
@@ -556,31 +634,72 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Page Details</th>
-                                    <th class="align-right">Action</th>
+                                    <th>Page Hierarchy</th>
+                                    <th class="align-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:forEach var="p" items="${pages}">
-                                    <tr>
-                                        <td>
-                                            <strong style="color:var(--slds-text-primary);">${fn:escapeXml(p.title)}</strong><br>
-                                            <code class="slug-pill">/${fn:escapeXml(p.slug)}</code>
-                                        </td>
-                                        <td class="align-right">
-                                            <div class="action-group" style="justify-content: flex-end;">
-                                                <button type="button" 
-                                                        class="btn btn-neutral btn-sm btn-edit-page" 
-                                                        data-id="${p.id}"
-                                                        data-title="${fn:escapeXml(p.title)}"
-                                                        data-slug="${fn:escapeXml(p.slug)}">
-                                                    Edit
-                                                </button>
-                                                <a href="pages?action=view&id=${p.id}" class="btn btn-brand btn-sm">Manage</a>
-                                                <a href="pages?action=delete&id=${p.id}" onclick="return confirm('Delete page?')" class="btn btn-destructive btn-sm">Delete</a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <c:if test="${empty p.parentId}">
+                                        <!-- Root Page Row -->
+                                        <tr>
+                                            <td>
+                                                <div class="page-title-block">
+                                                    <span class="page-name">
+                                                        <span class="badge-nav-root">Root</span>
+                                                        ${fn:escapeXml(p.title)}
+                                                    </span>
+                                                    <code class="slug-pill">/${fn:escapeXml(p.slug)}</code>
+                                                </div>
+                                            </td>
+                                            <td class="align-right">
+                                                <div class="action-group" style="justify-content: flex-end;">
+                                                    <button type="button" 
+                                                            class="btn btn-neutral btn-sm btn-edit-page" 
+                                                            data-id="${p.id}"
+                                                            data-title="${fn:escapeXml(p.title)}"
+                                                            data-slug="${fn:escapeXml(p.slug)}"
+                                                            data-parent-id="${p.parentId}">
+                                                        Edit
+                                                    </button>
+                                                    <a href="pages?action=view&id=${p.id}" class="btn btn-brand btn-sm">Manage</a>
+                                                    <a href="pages?action=delete&id=${p.id}" onclick="return confirm('Delete page?')" class="btn btn-destructive btn-sm">Delete</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Sub-Navigation Children Rows -->
+                                        <c:forEach var="sub" items="${pages}">
+                                            <c:if test="${sub.parentId == p.id}">
+                                                <tr class="sub-page-row">
+                                                    <td class="sub-page-cell">
+                                                        <div class="page-title-block">
+                                                            <span class="page-name">
+                                                                <span class="tree-connector">↳</span>
+                                                                <span class="badge-nav-sub">Sub</span>
+                                                                ${fn:escapeXml(sub.title)}
+                                                            </span>
+                                                            <code class="slug-pill">/${fn:escapeXml(sub.slug)}</code>
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-right">
+                                                        <div class="action-group" style="justify-content: flex-end;">
+                                                            <button type="button" 
+                                                                    class="btn btn-neutral btn-sm btn-edit-page" 
+                                                                    data-id="${sub.id}"
+                                                                    data-title="${fn:escapeXml(sub.title)}"
+                                                                    data-slug="${fn:escapeXml(sub.slug)}"
+                                                                    data-parent-id="${sub.parentId}">
+                                                                Edit
+                                                            </button>
+                                                            <a href="pages?action=view&id=${sub.id}" class="btn btn-brand btn-sm">Manage</a>
+                                                            <a href="pages?action=delete&id=${sub.id}" onclick="return confirm('Delete sub-page?')" class="btn btn-destructive btn-sm">Delete</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </c:if>
+                                        </c:forEach>
+                                    </c:if>
                                 </c:forEach>
                             </tbody>
                         </table>
@@ -599,12 +718,16 @@
                             <div>
                                 <h3 style="margin:0 0 0.15rem 0;">Editing: ${fn:escapeXml(activePage.title)}</h3>
                                 <code class="slug-pill">Path: /${fn:escapeXml(activePage.slug)}</code>
+                                <c:if test="${not empty activePage.parentId}">
+                                    <span class="badge" style="margin-left: 0.5rem;">Sub-page of Parent #${activePage.parentId}</span>
+                                </c:if>
                             </div>
                             <button type="button" 
                                     class="btn btn-neutral btn-sm btn-edit-page"
                                     data-id="${activePage.id}"
                                     data-title="${fn:escapeXml(activePage.title)}"
-                                    data-slug="${fn:escapeXml(activePage.slug)}">
+                                    data-slug="${fn:escapeXml(activePage.slug)}"
+                                    data-parent-id="${activePage.parentId}">
                                 Edit Page Details
                             </button>
                         </div>
@@ -761,55 +884,52 @@
                             </div>
                         </div>
                     </c:forEach>
-
+                    
                 </c:when>
-
                 <c:otherwise>
+                    <!-- EMPTY STATE WHEN NO PAGE IS SELECTED -->
                     <div class="slds-card">
-                        <div class="empty-state">
+                        <div class="slds-card-body empty-state">
                             <h3>No Page Selected</h3>
-                            <p>Select a page from the directory sidebar on the left to configure dynamic layout sections and media items.</p>
+                            <p>Select a page from the directory on the left to edit its content and manage sections, or create a new page to get started.</p>
                         </div>
                     </div>
                 </c:otherwise>
             </c:choose>
         </main>
 
-        <!-- RIGHT SIDEBAR: PAGE NAVIGATION -->
-        <c:if test="${not empty activePage}">
+        <!-- RIGHT STICKY NAVIGATION SIDEBAR -->
+        <c:if test="${not empty activePage and not empty activePage.sections}">
             <aside class="page-nav-sidebar">
                 <div class="slds-card">
                     <div class="slds-card-header">
                         <h3>Page Structure</h3>
-                        <span class="badge">${fn:length(activePage.sections)} Sections</span>
                     </div>
-                    <ul class="nav-list">
-                        <li>
-                            <a href="#page-overview" class="nav-link active">
-                                <span class="nav-link-title">Overview & Form</span>
-                            </a>
-                        </li>
-                        <c:forEach var="sec" items="${activePage.sections}">
+                    <div class="slds-card-body no-padding">
+                        <ul class="nav-list">
                             <li>
-                                <a href="#section-${sec.id}" class="nav-link">
-                                    <span class="nav-link-title">
-                                        <c:choose>
-                                            <c:when test="${not empty sec.title}">${fn:escapeXml(sec.title)}</c:when>
-                                            <c:otherwise>#${sec.sequenceOrder} ${fn:escapeXml(sec.sectionType)}</c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                    <span class="badge" style="font-size:0.65rem;">${fn:length(sec.images)} img</span>
+                                <a href="#page-overview" class="nav-link">
+                                    <span class="nav-link-title">Overview</span>
+                                    <span class="badge">Top</span>
                                 </a>
                             </li>
-                        </c:forEach>
-                    </ul>
+                            <c:forEach var="sec" items="${activePage.sections}">
+                                <li>
+                                    <a href="#section-${sec.id}" class="nav-link">
+                                        <span class="nav-link-title">${fn:escapeXml(sec.title)}</span>
+                                        <span class="badge badge-type">#${sec.sequenceOrder}</span>
+                                    </a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </div>
                 </div>
             </aside>
         </c:if>
 
     </div>
 
-    <!-- EDIT PAGE MODAL -->
+    <!-- MODAL: EDIT PAGE DETAILS -->
     <div class="modal-backdrop" id="editPageModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -817,29 +937,36 @@
                 <button type="button" class="modal-close" onclick="closeModal('editPageModal')">&times;</button>
             </div>
             <form action="pages" method="post">
+                <input type="hidden" name="action" value="updatePage">
+                <input type="hidden" name="id" id="editPageId">
                 <div class="modal-body">
-                    <input type="hidden" name="action" value="editPage">
-                    <input type="hidden" name="pageId" id="modalPageId">
-
                     <div class="form-group">
-                        <label for="modalPageTitle">Page Title</label>
-                        <input type="text" name="title" id="modalPageTitle" required>
+                        <label for="editPageTitle">Page Title</label>
+                        <input type="text" id="editPageTitle" name="title" required>
                     </div>
-
-                    <div class="form-group" style="margin-top:0.75rem;">
-                        <label for="modalPageSlug">URL Slug</label>
-                        <input type="text" name="slug" id="modalPageSlug" required>
+                    <div class="form-group">
+                        <label for="editPageSlug">URL Slug</label>
+                        <input type="text" id="editPageSlug" name="slug" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editParentId">Parent Page (Sub-Navigation)</label>
+                        <select id="editParentId" name="parentId">
+                            <option value="">-- None (Top Level Menu) --</option>
+                            <c:forEach var="p" items="${pages}">
+                                <option value="${p.id}">${fn:escapeXml(p.title)}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-neutral" onclick="closeModal('editPageModal')">Cancel</button>
-                    <button type="submit" class="btn btn-brand">Save Page</button>
+                    <button type="submit" class="btn btn-brand">Save Changes</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- EDIT SECTION MODAL -->
+    <!-- MODAL: EDIT SECTION -->
     <div class="modal-backdrop" id="editSectionModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -847,165 +974,164 @@
                 <button type="button" class="modal-close" onclick="closeModal('editSectionModal')">&times;</button>
             </div>
             <form action="pages" method="post">
+                <input type="hidden" name="action" value="updateSection">
+                <input type="hidden" name="sectionId" id="editSectionId">
+                <input type="hidden" name="pageId" value="${activePage.id}">
                 <div class="modal-body">
-                    <input type="hidden" name="action" value="updateSection">
-                    <input type="hidden" name="pageId" value="${activePage.id}">
-                    <input type="hidden" name="sectionId" id="modalSectionId">
-
                     <div class="form-row">
                         <div class="form-group col-type">
-                            <label>Type</label>
-                            <select name="sectionType" id="modalSectionType">
+                            <label for="editSectionType">Type</label>
+                            <select id="editSectionType" name="sectionType">
                                 <option value="hero">Hero</option>
                                 <option value="district">District</option>
                                 <option value="popup_modal">Pop-up Modal</option>
                                 <option value="person_details">PERSON-DETAILS</option>
                             </select>
                         </div>
-
                         <div class="form-group col-seq-sm">
-                            <label>Sequence</label>
-                            <input type="number" name="sequenceOrder" id="modalSectionSequence" min="1" required>
+                            <label for="editSectionSeq">Sequence</label>
+                            <input type="number" id="editSectionSeq" name="sequenceOrder" min="1" required>
                         </div>
-
                         <div class="form-group col-title">
-                            <label>Section Title</label>
-                            <input type="text" name="title" id="modalSectionTitle">
+                            <label for="editSectionTitle">Title</label>
+                            <input type="text" id="editSectionTitle" name="title" required>
                         </div>
                     </div>
-
-                    <div class="form-group" style="margin-top:0.75rem;">
-                        <label>Content Description</label>
-                        <textarea name="content" id="modalSectionContent" rows="5"></textarea>
+                    <div class="form-group" style="margin-top: 0.35rem;">
+                        <label for="editSectionContent">Content Description</label>
+                        <textarea id="editSectionContent" name="content" rows="4"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-neutral" onclick="closeModal('editSectionModal')">Cancel</button>
-                    <button type="submit" class="btn btn-brand">Save Changes</button>
+                    <button type="submit" class="btn btn-brand">Update Section</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- EDIT IMAGE / MEDIA MODAL -->
+    <!-- MODAL: EDIT IMAGE METADATA -->
     <div class="modal-backdrop" id="editImageModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>Edit Asset Metadata & Headings</h3>
+                <h3>Edit Asset Metadata</h3>
                 <button type="button" class="modal-close" onclick="closeModal('editImageModal')">&times;</button>
             </div>
-            <form action="pages?action=updateImage" method="post" enctype="multipart/form-data">
+            <form action="pages" method="post">
+                <input type="hidden" name="action" value="updateImageMeta">
+                <input type="hidden" name="imageId" id="editImageId">
+                <input type="hidden" name="pageId" value="${activePage.id}">
                 <div class="modal-body">
-                    <input type="hidden" name="pageId" value="${activePage.id}">
-                    <input type="hidden" name="imageId" id="modalImageId">
-
-                    <div class="form-group">
-                        <label>Replace Image (Optional)</label>
-                        <input type="file" name="imageFile" accept="image/*">
-                    </div>
-
                     <div class="form-row">
                         <div class="form-group col-alt">
-                            <label>Heading 1</label>
-                            <input type="text" name="heading1" id="modalImageHeading1">
+                            <label for="editImageH1">Heading 1</label>
+                            <input type="text" id="editImageH1" name="heading1">
                         </div>
                         <div class="form-group col-alt">
-                            <label>Heading 2</label>
-                            <input type="text" name="heading2" id="modalImageHeading2">
+                            <label for="editImageH2">Heading 2</label>
+                            <input type="text" id="editImageH2" name="heading2">
                         </div>
                     </div>
-
                     <div class="form-row" style="margin-top:0.35rem;">
                         <div class="form-group col-alt">
-                            <label>Alt Text / Description</label>
-                            <input type="text" name="altText" id="modalImageAltText">
+                            <label for="editImageAlt">Alt Text / Description</label>
+                            <input type="text" id="editImageAlt" name="altText">
                         </div>
                         <div class="form-group col-seq-xs">
-                            <label>Seq #</label>
-                            <input type="number" name="sequenceOrder" id="modalImageSequence" min="1" required>
+                            <label for="editImageSeq">Seq #</label>
+                            <input type="number" id="editImageSeq" name="sequenceOrder" min="1" required>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-neutral" onclick="closeModal('editImageModal')">Cancel</button>
-                    <button type="submit" class="btn btn-brand">Update Asset</button>
+                    <button type="submit" class="btn btn-brand">Save Asset</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- JS EVENT HANDLERS -->
+    <!-- JAVASCRIPT HANDLERS -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            // Highlight active link in section navigation on scroll
-            const navLinks = document.querySelectorAll('.page-nav-sidebar .nav-link');
-            const sections = document.querySelectorAll('.main-content > div[id]');
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('active');
+        }
 
-            window.addEventListener('scroll', function () {
-                let current = '';
-                sections.forEach(function (section) {
-                    const sectionTop = section.offsetTop - 90;
-                    if (window.pageYOffset >= sectionTop) {
-                        current = section.getAttribute('id');
-                    }
-                });
-
-                navLinks.forEach(function (link) {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === '#' + current) {
-                        link.classList.add('active');
-                    }
-                });
-            });
-
-            // Handle Edit Page Modal
-            document.querySelectorAll('.btn-edit-page').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    document.getElementById('modalPageId').value = this.dataset.id;
-                    document.getElementById('modalPageTitle').value = this.dataset.title;
-                    document.getElementById('modalPageSlug').value = this.dataset.slug;
-                    document.getElementById('editPageModal').classList.add('active');
-                });
-            });
-
-            // Handle Edit Section Modal
-            document.querySelectorAll('.btn-edit-section').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    const secId = this.dataset.id;
-                    const contentStore = document.getElementById('section-content-data-' + secId);
-                    
-                    document.getElementById('modalSectionId').value = secId;
-                    document.getElementById('modalSectionType').value = this.dataset.type;
-                    document.getElementById('modalSectionSequence').value = this.dataset.seq;
-                    document.getElementById('modalSectionTitle').value = this.dataset.title || '';
-                    
-                    document.getElementById('modalSectionContent').value = contentStore ? contentStore.textContent.trim() : '';
-                    document.getElementById('editSectionModal').classList.add('active');
-                });
-            });
-
-            // Handle Edit Image Modal
-            document.querySelectorAll('.btn-edit-image').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    document.getElementById('modalImageId').value = this.dataset.id;
-                    document.getElementById('modalImageSequence').value = this.dataset.seq;
-                    document.getElementById('modalImageAltText').value = this.dataset.alt || '';
-                    document.getElementById('modalImageHeading1').value = this.dataset.h1 || '';
-                    document.getElementById('modalImageHeading2').value = this.dataset.h2 || '';
-                    document.getElementById('editImageModal').classList.add('active');
-                });
-            });
-        });
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
         }
 
         // Close modal when clicking on backdrop
-        window.addEventListener('click', function(event) {
-            if (event.target.classList.contains('modal-backdrop')) {
-                event.target.classList.remove('active');
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal-backdrop')) {
+                e.target.classList.remove('active');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Edit Page Click Handlers
+            document.querySelectorAll('.btn-edit-page').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('editPageId').value = this.dataset.id;
+                    document.getElementById('editPageTitle').value = this.dataset.title;
+                    document.getElementById('editPageSlug').value = this.dataset.slug;
+                    document.getElementById('editParentId').value = this.dataset.parentId || '';
+                    openModal('editPageModal');
+                });
+            });
+
+            // Edit Section Click Handlers
+            document.querySelectorAll('.btn-edit-section').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const secId = this.dataset.id;
+                    document.getElementById('editSectionId').value = secId;
+                    document.getElementById('editSectionType').value = this.dataset.type;
+                    document.getElementById('editSectionSeq').value = this.dataset.seq;
+                    document.getElementById('editSectionTitle').value = this.dataset.title;
+                    
+                    const contentStore = document.getElementById('section-content-data-' + secId);
+                    document.getElementById('editSectionContent').value = contentStore ? contentStore.innerText : '';
+                    
+                    openModal('editSectionModal');
+                });
+            });
+
+            // Edit Image Click Handlers
+            document.querySelectorAll('.btn-edit-image').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('editImageId').value = this.dataset.id;
+                    document.getElementById('editImageSeq').value = this.dataset.seq;
+                    document.getElementById('editImageAlt').value = this.dataset.alt || '';
+                    document.getElementById('editImageH1').value = this.dataset.h1 || '';
+                    document.getElementById('editImageH2').value = this.dataset.h2 || '';
+                    openModal('editImageModal');
+                });
+            });
+
+            // Sticky Navigation Scrollspy Highlights
+            const navLinks = document.querySelectorAll('.page-nav-sidebar .nav-link');
+            if (navLinks.length > 0) {
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '-10% 0px -70% 0px',
+                    threshold: 0
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.getAttribute('id');
+                            navLinks.forEach(link => {
+                                link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                            });
+                        }
+                    });
+                }, observerOptions);
+
+                const targets = document.querySelectorAll('#page-overview, .section-card');
+                targets.forEach(target => observer.observe(target));
             }
         });
     </script>

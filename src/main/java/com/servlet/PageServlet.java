@@ -108,14 +108,18 @@ public class PageServlet extends HttpServlet {
             if ("createPage".equals(action)) {
                 String title = req.getParameter("title");
                 String slug = req.getParameter("slug");
-                Long newId = createPage(conn, title, slug);
+                Long parentId = parseLongOrNull(req.getParameter("parentId"));
+
+                Long newId = createPage(conn, title, slug, parentId);
                 resp.sendRedirect("pages?action=view&id=" + newId);
 
             } else if ("editPage".equals(action)) {
                 Long pageId = Long.parseLong(req.getParameter("pageId"));
                 String title = req.getParameter("title");
                 String slug = req.getParameter("slug");
-                updatePage(conn, pageId, title, slug);
+                Long parentId = parseLongOrNull(req.getParameter("parentId"));
+
+                updatePage(conn, pageId, title, slug, parentId);
                 resp.sendRedirect("pages?action=view&id=" + pageId);
 
             } else if ("addSection".equals(action)) {
@@ -186,6 +190,17 @@ public class PageServlet extends HttpServlet {
                 || "Admin".equalsIgnoreCase(role);
     }
 
+    private Long parseLongOrNull(String str) {
+        if (str == null || str.trim().isEmpty() || "null".equalsIgnoreCase(str.trim())) {
+            return null;
+        }
+        try {
+            return Long.parseLong(str.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private void renderImageFromDb(Connection conn, Long imageId, HttpServletResponse resp) throws SQLException, IOException {
         String sql = "SELECT image_data, image_type FROM section_images WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -250,12 +265,16 @@ public class PageServlet extends HttpServlet {
 
     private List<PageBean> getAllPages(Connection conn) throws SQLException {
         List<PageBean> list = new ArrayList<>();
-        String sql = "SELECT * FROM pages ORDER BY id DESC";
+        String sql = "SELECT id, parent_id, title, slug, created_at FROM pages ORDER BY id DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 PageBean p = new PageBean();
                 p.setId(rs.getLong("id"));
+                
+                long parentId = rs.getLong("parent_id");
+                p.setParentId(rs.wasNull() ? null : parentId);
+                
                 p.setTitle(rs.getString("title"));
                 p.setSlug(rs.getString("slug"));
                 list.add(p);
@@ -266,7 +285,7 @@ public class PageServlet extends HttpServlet {
 
     private PageBean getPageDetails(Connection conn, Long pageId) throws SQLException {
         PageBean page = null;
-        String sql = "SELECT p.id as page_id, p.title as page_title, p.slug, " +
+        String sql = "SELECT p.id as page_id, p.parent_id, p.title as page_title, p.slug, " +
                      "s.id as section_id, s.section_type, s.sequence_order as sec_order, s.title as sec_title, s.content, " +
                      "i.id as image_id, i.image_type, i.alt_text, i.sequence_order as img_order, " +
                      "i.created_at, i.Heading1, i.Heading2 " +
@@ -285,6 +304,10 @@ public class PageServlet extends HttpServlet {
                     if (page == null) {
                         page = new PageBean();
                         page.setId(rs.getLong("page_id"));
+                        
+                        long parentId = rs.getLong("parent_id");
+                        page.setParentId(rs.wasNull() ? null : parentId);
+                        
                         page.setTitle(rs.getString("page_title"));
                         page.setSlug(rs.getString("slug"));
                     }
@@ -324,11 +347,16 @@ public class PageServlet extends HttpServlet {
         return page;
     }
 
-    private Long createPage(Connection conn, String title, String slug) throws SQLException {
-        String sql = "INSERT INTO pages (title, slug) VALUES (?, ?)";
+    private Long createPage(Connection conn, String title, String slug, Long parentId) throws SQLException {
+        String sql = "INSERT INTO pages (title, slug, parent_id) VALUES (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, title);
             ps.setString(2, slug);
+            if (parentId != null) {
+                ps.setLong(3, parentId);
+            } else {
+                ps.setNull(3, Types.BIGINT);
+            }
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) return rs.getLong(1);
@@ -337,12 +365,17 @@ public class PageServlet extends HttpServlet {
         return null;
     }
 
-    private void updatePage(Connection conn, Long pageId, String title, String slug) throws SQLException {
-        String sql = "UPDATE pages SET title = ?, slug = ? WHERE id = ?";
+    private void updatePage(Connection conn, Long pageId, String title, String slug, Long parentId) throws SQLException {
+        String sql = "UPDATE pages SET title = ?, slug = ?, parent_id = ? WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, title);
             ps.setString(2, slug);
-            ps.setLong(3, pageId);
+            if (parentId != null) {
+                ps.setLong(3, parentId);
+            } else {
+                ps.setNull(3, Types.BIGINT);
+            }
+            ps.setLong(4, pageId);
             ps.executeUpdate();
         }
     }
