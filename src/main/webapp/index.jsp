@@ -744,7 +744,7 @@
                                             <label>Type</label>
                                             <select name="sectionType">
                                                 <option value="hero">Hero</option>
-                                                <option value="district">DISTINCT</option>
+                                                <option value="DISTINCT">DISTINCT</option>
                                                 <option value="popup_modal">Pop-up Modal</option>
                                                 <option value="person_details">PERSON-DETAILS</option>
                                             </select>
