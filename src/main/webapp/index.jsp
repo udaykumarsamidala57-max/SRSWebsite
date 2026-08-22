@@ -745,7 +745,7 @@
                                             <select name="sectionType">
                                                 <option value="hero">Hero</option>
                                                 <option value="DISTINCT">DISTINCT</option>
-                                                <option value="popup_modal">Pop-up Modal</option>
+                                                <option value="DESC">DESC</option>
                                                 <option value="person_details">PERSON-DETAILS</option>
                                             </select>
                                         </div>
@@ -984,7 +984,7 @@
                             <select id="editSectionType" name="sectionType">
                                 <option value="hero">Hero</option>
                                 <option value="district">District</option>
-                                <option value="popup_modal">Pop-up Modal</option>
+                                <option value="DESC">DESC</option>
                                 <option value="person_details">PERSON-DETAILS</option>
                             </select>
                         </div>
