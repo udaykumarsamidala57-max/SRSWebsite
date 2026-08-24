@@ -746,6 +746,7 @@
                                                 <option value="hero">Hero</option>
                                                 <option value="DISTINCT">DISTINCT</option>
                                                 <option value="DESC">DESC</option>
+                                                <option value="DESC">DESC2</option>
                                                 <option value="person_details">PERSON-DETAILS</option>
                                             </select>
                                         </div>
