@@ -113,8 +113,13 @@ public class PageServlet extends HttpServlet {
                 Long newId = createPage(conn, title, slug, parentId);
                 resp.sendRedirect("pages?action=view&id=" + newId);
 
-            } else if ("editPage".equals(action)) {
-                Long pageId = Long.parseLong(req.getParameter("pageId"));
+            } else if ("updatePage".equals(action) || "editPage".equals(action)) {
+                // Accepts both updatePage (from modal form) and editPage
+                Long pageId = parseLongOrNull(req.getParameter("id"));
+                if (pageId == null) {
+                    pageId = parseLongOrNull(req.getParameter("pageId"));
+                }
+                
                 String title = req.getParameter("title");
                 String slug = req.getParameter("slug");
                 Long parentId = parseLongOrNull(req.getParameter("parentId"));
@@ -160,7 +165,8 @@ public class PageServlet extends HttpServlet {
                 }
                 resp.sendRedirect("pages?action=view&id=" + pageId);
 
-            } else if ("updateImage".equals(action)) {
+            } else if ("updateImageMeta".equals(action) || "updateImage".equals(action)) {
+                // Supports both modal metadata updates and full image replacements
                 Long pageId = Long.parseLong(req.getParameter("pageId"));
                 Long imageId = Long.parseLong(req.getParameter("imageId"));
                 String alt = req.getParameter("altText");
@@ -168,7 +174,13 @@ public class PageServlet extends HttpServlet {
                 String heading1 = req.getParameter("heading1");
                 String heading2 = req.getParameter("heading2");
 
-                Part filePart = req.getPart("imageFile");
+                Part filePart = null;
+                try {
+                    filePart = req.getPart("imageFile");
+                } catch (Exception ignored) {
+                    // Form didn't include file input (e.g. metadata-only modal)
+                }
+
                 if (filePart != null && filePart.getSize() > 0) {
                     String contentType = filePart.getContentType();
                     try (InputStream inputStream = filePart.getInputStream()) {

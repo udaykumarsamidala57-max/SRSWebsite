@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%
+    // Session check MUST be at the very top before any white space or dynamic output
     HttpSession sess = request.getSession(false);
     if (sess == null || sess.getAttribute("username") == null) {
         response.sendRedirect("login.jsp");
@@ -12,6 +11,8 @@
     String dept   = (String) sess.getAttribute("department");
     String branch = (String) sess.getAttribute("branch");
 %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,556 +24,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- External CSS -->
-    <link rel="stylesheet" href="css/page.css">
-    
-    <style>
-        :root {
-            /* Salesforce Lightning Design System Palette */
-            --slds-brand: #0176d3;
-            --slds-brand-hover: #014486;
-            --slds-brand-light: #eef4fe;
-            --slds-text-primary: #180828;
-            --slds-text-secondary: #444444;
-            --slds-text-weak: #747474;
-            --slds-bg-canvas: #f3f3f3;
-            --slds-bg-card: #ffffff;
-            --slds-border: #c9c9c9;
-            --slds-border-subtle: #e5e5e5;
-            --slds-destructive: #ba0517;
-            --slds-destructive-hover: #8e0312;
-            --slds-radius: 4px;
-            --slds-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--slds-bg-canvas);
-            color: var(--slds-text-primary);
-            margin: 0;
-            padding: 0;
-            font-size: 13px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Salesforce Global Header */
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.6rem 1.5rem;
-            background: #ffffff;
-            border-bottom: 1px solid var(--slds-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .header-brand-icon {
-            width: 28px;
-            height: 28px;
-            background: var(--slds-brand);
-            border-radius: var(--slds-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .header-brand h1 {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--slds-text-primary);
-            letter-spacing: -0.01em;
-        }
-
-        .user-nav { display: flex; align-items: center; gap: 1rem; }
-        .user-info { font-size: 0.8rem; color: var(--slds-text-secondary); }
-        .user-info strong { color: var(--slds-text-primary); }
-
-        .btn-logout {
-            background-color: #ffffff;
-            color: var(--slds-text-secondary);
-            padding: 0.35rem 0.75rem;
-            font-size: 0.775rem;
-            font-weight: 600;
-            border-radius: var(--slds-radius);
-            text-decoration: none;
-            border: 1px solid var(--slds-border);
-            transition: all 0.15s ease;
-        }
-        .btn-logout:hover {
-            background-color: var(--slds-destructive);
-            color: #ffffff;
-            border-color: var(--slds-destructive);
-        }
-
-        /* Main Workspace Grid */
-       .app-container {
-    display: grid;
-    /* Allows the sidebar to grow naturally between 320px and 400px before allocating space to the main content */
-    grid-template-columns: minmax(320px, 400px) 1fr 240px;
-    gap: 1.25rem;
-    padding: 1.25rem;
-    max-width: 1720px;
-    margin: 0 auto;
-}
-
-        @media (max-width: 1300px) {
-            .app-container { grid-template-columns: 300px 1fr; }
-            .page-nav-sidebar { display: none; }
-        }
-
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        /* SLDS Card Component */
-        .slds-card {
-            background: var(--slds-bg-card);
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            box-shadow: var(--slds-shadow);
-            overflow: hidden;
-        }
-
-        .slds-card-header {
-            padding: 0.75rem 1rem;
-            background: #ffffff;
-            border-bottom: 1px solid var(--slds-border-subtle);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .slds-card-header h3 {
-            margin: 0;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--slds-text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .slds-card-body { padding: 1rem; }
-        .slds-card-body.no-padding { padding: 0; }
-
-        /* Form Controls */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .form-group label {
-            font-size: 0.725rem;
-            font-weight: 700;
-            color: var(--slds-text-secondary);
-            text-transform: uppercase;
-        }
-
-        .form-group input, .form-group select, .form-group textarea,
-        .form-row input, .form-row select {
-            padding: 0.45rem 0.65rem;
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            font-size: 0.825rem;
-            color: var(--slds-text-primary);
-            background: #ffffff;
-            outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus,
-        .form-row input:focus, .form-row select:focus {
-            border-color: var(--slds-brand);
-            box-shadow: 0 0 0 2px var(--slds-brand-light);
-        }
-
-        /* Buttons System */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.4rem 0.75rem;
-            font-size: 0.775rem;
-            font-weight: 600;
-            border-radius: var(--slds-radius);
-            border: 1px solid transparent;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.15s ease-in-out;
-            gap: 0.35rem;
-            line-height: 1.2;
-        }
-
-        .btn-brand {
-            background-color: var(--slds-brand);
-            color: #ffffff;
-        }
-        .btn-brand:hover { background-color: var(--slds-brand-hover); }
-
-        .btn-neutral {
-            background-color: #ffffff;
-            color: var(--slds-text-primary);
-            border-color: var(--slds-border);
-        }
-        .btn-neutral:hover {
-            background-color: var(--slds-bg-canvas);
-            border-color: var(--slds-border);
-        }
-
-        .btn-destructive {
-            background-color: #ffffff;
-            color: var(--slds-destructive);
-            border-color: var(--slds-border);
-        }
-        .btn-destructive:hover {
-            background-color: var(--slds-destructive);
-            color: #ffffff;
-            border-color: var(--slds-destructive);
-        }
-
-        .btn-sm { padding: 0.25rem 0.45rem; font-size: 0.725rem; }
-        .btn-full { width: 100%; }
-
-        /* Modernized Directory Table */
-        .directory-table {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .directory-table table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .directory-table th {
-            padding: 0.6rem 0.75rem;
-            font-size: 0.685rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--slds-text-weak);
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--slds-border);
-        }
-
-        .directory-table td {
-            padding: 0.65rem 0.75rem;
-            border-bottom: 1px solid var(--slds-border-subtle);
-            font-size: 0.8rem;
-            vertical-align: middle;
-        }
-
-        .directory-table tr:hover {
-            background-color: #fbfbfd;
-        }
-
-        /* Parent/Child Alignment Rules */
-        .page-title-block {
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-
-        .page-name {
-            font-weight: 600;
-            color: var(--slds-text-primary);
-            line-height: 1.25;
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .sub-page-row {
-            background-color: #fafafa;
-        }
-
-        .sub-page-cell {
-            padding-left: 1.25rem !important;
-            border-left: 3px solid var(--slds-brand);
-        }
-
-        .tree-connector {
-            color: var(--slds-brand);
-            font-weight: 700;
-            font-size: 0.85rem;
-            user-select: none;
-        }
-
-        .slug-pill {
-            display: inline-block;
-            padding: 0.1rem 0.35rem;
-            background: #eef4fe;
-            color: var(--slds-brand);
-            border-radius: var(--slds-radius);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            width: fit-content;
-        }
-
-        .badge-nav-root {
-            background: #e1f5fe;
-            color: #0288d1;
-            font-size: 0.625rem;
-            padding: 0.1rem 0.3rem;
-            border-radius: 2px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .badge-nav-sub {
-            background: #f3e5f5;
-            color: #7b1fa2;
-            font-size: 0.625rem;
-            padding: 0.1rem 0.3rem;
-            border-radius: 2px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        /* Active Page Workspace */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            min-width: 0;
-        }
-
-        .section-card {
-            background: #ffffff;
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            box-shadow: var(--slds-shadow);
-            overflow: hidden;
-            scroll-margin-top: 4.5rem;
-        }
-
-        .section-header {
-            padding: 0.65rem 1rem;
-            background: #fafafa;
-            border-bottom: 1px solid var(--slds-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .section-title-group { display: flex; align-items: center; gap: 0.5rem; }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.15rem 0.45rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            background: var(--slds-bg-canvas);
-            color: var(--slds-text-secondary);
-            border: 1px solid var(--slds-border);
-        }
-
-        .badge-type {
-            background: var(--slds-brand-light);
-            color: var(--slds-brand);
-            border-color: transparent;
-            text-transform: uppercase;
-        }
-
-        .section-body { padding: 1rem; }
-        .section-description {
-            font-size: 0.85rem;
-            color: var(--slds-text-secondary);
-            margin-top: 0;
-            margin-bottom: 1rem;
-            line-height: 1.45;
-        }
-
-        /* Asset Gallery Grid */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-            gap: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        .img-card {
-            background: #ffffff;
-            border: 1px solid var(--slds-border);
-            border-radius: var(--slds-radius);
-            padding: 0.5rem;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .img-container {
-            width: 100%;
-            height: 120px;
-            background: var(--slds-bg-canvas);
-            border-radius: 2px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .badge-overlay {
-            position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            background: rgba(24, 8, 40, 0.85);
-            color: #ffffff;
-            border: none;
-        }
-
-        .img-headings {
-            padding: 0.3rem 0.45rem;
-            background: var(--slds-bg-canvas);
-            border-radius: 2px;
-            font-size: 0.725rem;
-        }
-        .img-headings strong { display: block; color: var(--slds-text-primary); }
-        .img-headings em { color: var(--slds-text-weak); font-style: normal; }
-
-        .img-meta {
-            font-size: 0.75rem;
-            color: var(--slds-text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Form Sub-Panels */
-        .nested-form-block {
-            background: var(--slds-bg-canvas);
-            border: 1px dashed var(--slds-border);
-            border-radius: var(--slds-radius);
-            padding: 0.85rem;
-        }
-
-        .nested-form-block.solid-border {
-            border-style: solid;
-            background: #ffffff;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-end;
-        }
-
-        .col-type { width: 130px; }
-        .col-seq-sm { width: 80px; }
-        .col-seq-xs { width: 65px; }
-        .col-title { flex: 1; }
-        .col-file { flex: 1; }
-        .col-alt { flex: 1; }
-
-        /* Right Sticky Navigation */
-        .page-nav-sidebar {
-            position: sticky;
-            top: 4.5rem;
-            align-self: flex-start;
-        }
-
-        .nav-list {
-            list-style: none;
-            margin: 0;
-            padding: 0.25rem 0;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.45rem 0.85rem;
-            color: var(--slds-text-secondary);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 500;
-            border-left: 3px solid transparent;
-            transition: all 0.15s ease-in-out;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background: var(--slds-brand-light);
-            color: var(--slds-brand);
-            border-left-color: var(--slds-brand);
-        }
-
-        .nav-link-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 130px;
-        }
-
-        /* Modal Box System */
-        .modal-backdrop {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(8, 7, 7, 0.55); backdrop-filter: blur(2px); z-index: 999;
-            align-items: center; justify-content: center;
-        }
-        .modal-backdrop.active { display: flex; }
-
-        .modal-card {
-            background: #ffffff; width: 100%; max-width: 540px; border-radius: var(--slds-radius);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2); overflow: hidden; animation: modalFadeIn 0.15s ease-out;
-        }
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            padding: 0.85rem 1rem; background: #fafafa; border-bottom: 1px solid var(--slds-border);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .modal-header h3 { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--slds-text-primary); }
-        .modal-close { background: transparent; border: none; font-size: 1.25rem; cursor: pointer; color: var(--slds-text-weak); }
-        .modal-close:hover { color: var(--slds-text-primary); }
-        .modal-body { padding: 1rem; }
-        .modal-footer {
-            padding: 0.75rem 1rem; background: #fafafa; border-top: 1px solid var(--slds-border);
-            display: flex; justify-content: flex-end; gap: 0.5rem;
-        }
-        
-        .action-group { display: flex; gap: 0.25rem; }
-        .align-right { text-align: right; }
-        .sub-header { margin: 0 0 0.75rem 0; font-size: 0.8rem; font-weight: 700; color: var(--slds-text-primary); text-transform: uppercase; }
-        .hidden-content-store { display: none; }
-        .empty-state { text-align: center; padding: 2.5rem 1.5rem; }
-        .empty-state h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--slds-text-primary); }
-        .empty-state p { margin: 0; font-size: 0.825rem; color: var(--slds-text-secondary); }
-    </style>
+    <link rel="stylesheet" href="<c:url value='/css/page.css'/>">
+    <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
+    <!-- External JS -->
+    <script type="module" src="<c:url value='/js/index.js'/>" defer></script>
 </head>
 <body>
-
-    <!-- GLOBAL APEX HEADER -->
     <header class="app-header">
         <div class="header-brand">
             <div class="header-brand-icon">P</div>
@@ -746,7 +203,7 @@
                                                 <option value="hero">Hero</option>
                                                 <option value="DISTINCT">DISTINCT</option>
                                                 <option value="DESC">DESC</option>
-                                                <option value="DESC">DESC2</option>
+                                                <option value="DESC2">DESC2</option>
                                                 <option value="person_details">PERSON-DETAILS</option>
                                             </select>
                                         </div>
@@ -867,15 +324,15 @@
                                         </div>
 
                                         <div class="form-row" style="margin-top:0.35rem;">
-                                            <div class="form-group col-alt">
-                                                <label>Alt Text / Description</label>
-                                                <input type="text" name="altText" placeholder="Image description">
+                                            <div class="form-group col-alt" style="flex: 1;">
+                                                <label for="uploadAltText">Alt Text / Description</label>
+                                                <textarea id="uploadAltText" name="altText" rows="3" placeholder="Image description..." style="width: 100%; resize: vertical;"></textarea>
                                             </div>
                                             <div class="form-group col-seq-xs">
                                                 <label>Seq #</label>
                                                 <input type="number" name="sequenceOrder" value="1" min="1" required>
                                             </div>
-                                            <div style="margin-bottom:0.75rem;">
+                                            <div style="margin-bottom:0.75rem; align-self: flex-end;">
                                                 <button type="submit" class="btn btn-neutral">Upload Asset</button>
                                             </div>
                                         </div>
@@ -984,8 +441,9 @@
                             <label for="editSectionType">Type</label>
                             <select id="editSectionType" name="sectionType">
                                 <option value="hero">Hero</option>
-                                <option value="district">District</option>
+                                <option value="DISTINCT">DISTINCT</option>
                                 <option value="DESC">DESC</option>
+                                <option value="DESC2">DESC2</option>
                                 <option value="person_details">PERSON-DETAILS</option>
                             </select>
                         </div>
@@ -1034,9 +492,9 @@
                         </div>
                     </div>
                     <div class="form-row" style="margin-top:0.35rem;">
-                        <div class="form-group col-alt">
+                        <div class="form-group col-alt" style="flex: 1;">
                             <label for="editImageAlt">Alt Text / Description</label>
-                            <input type="text" id="editImageAlt" name="altText">
+                            <textarea id="editImageAlt" name="altText" rows="3" placeholder="Image description..." style="width: 100%; resize: vertical;"></textarea>
                         </div>
                         <div class="form-group col-seq-xs">
                             <label for="editImageSeq">Seq #</label>
@@ -1052,89 +510,5 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT HANDLERS -->
-    <script>
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.add('active');
-        }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.remove('active');
-        }
-
-        // Close modal when clicking on backdrop
-        window.onclick = function(e) {
-            if (e.target.classList.contains('modal-backdrop')) {
-                e.target.classList.remove('active');
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Edit Page Click Handlers
-            document.querySelectorAll('.btn-edit-page').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.getElementById('editPageId').value = this.dataset.id;
-                    document.getElementById('editPageTitle').value = this.dataset.title;
-                    document.getElementById('editPageSlug').value = this.dataset.slug;
-                    document.getElementById('editParentId').value = this.dataset.parentId || '';
-                    openModal('editPageModal');
-                });
-            });
-
-            // Edit Section Click Handlers
-            document.querySelectorAll('.btn-edit-section').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const secId = this.dataset.id;
-                    document.getElementById('editSectionId').value = secId;
-                    document.getElementById('editSectionType').value = this.dataset.type;
-                    document.getElementById('editSectionSeq').value = this.dataset.seq;
-                    document.getElementById('editSectionTitle').value = this.dataset.title;
-                    
-                    const contentStore = document.getElementById('section-content-data-' + secId);
-                    document.getElementById('editSectionContent').value = contentStore ? contentStore.innerText : '';
-                    
-                    openModal('editSectionModal');
-                });
-            });
-
-            // Edit Image Click Handlers
-            document.querySelectorAll('.btn-edit-image').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.getElementById('editImageId').value = this.dataset.id;
-                    document.getElementById('editImageSeq').value = this.dataset.seq;
-                    document.getElementById('editImageAlt').value = this.dataset.alt || '';
-                    document.getElementById('editImageH1').value = this.dataset.h1 || '';
-                    document.getElementById('editImageH2').value = this.dataset.h2 || '';
-                    openModal('editImageModal');
-                });
-            });
-
-            // Sticky Navigation Scrollspy Highlights
-            const navLinks = document.querySelectorAll('.page-nav-sidebar .nav-link');
-            if (navLinks.length > 0) {
-                const observerOptions = {
-                    root: null,
-                    rootMargin: '-10% 0px -70% 0px',
-                    threshold: 0
-                };
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const id = entry.target.getAttribute('id');
-                            navLinks.forEach(link => {
-                                link.classList.toggle('active', link.getAttribute('href') === '#' + id);
-                            });
-                        }
-                    });
-                }, observerOptions);
-
-                const targets = document.querySelectorAll('#page-overview, .section-card');
-                targets.forEach(target => observer.observe(target));
-            }
-        });
-    </script>
 </body>
 </html>
