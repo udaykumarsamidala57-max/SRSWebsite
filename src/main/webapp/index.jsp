@@ -204,6 +204,8 @@
                                                 <option value="DISTINCT">DISTINCT</option>
                                                 <option value="DESC">DESC</option>
                                                 <option value="DESC2">DESC2</option>
+                                                <option value="DESC3">DESC3</option>
+                                                <option value="SIDE_DESIGN">SIDE_DESIGN</option>
                                                 <option value="person_details">PERSON-DETAILS</option>
                                             </select>
                                         </div>
@@ -441,10 +443,12 @@
                             <label for="editSectionType">Type</label>
                             <select id="editSectionType" name="sectionType">
                                 <option value="hero">Hero</option>
-                                <option value="DISTINCT">DISTINCT</option>
-                                <option value="DESC">DESC</option>
-                                <option value="DESC2">DESC2</option>
-                                <option value="person_details">PERSON-DETAILS</option>
+                                                <option value="DISTINCT">DISTINCT</option>
+                                                <option value="DESC">DESC</option>
+                                                <option value="DESC2">DESC2</option>
+                                                <option value="DESC3">DESC3</option>
+                                                <option value="SIDE_DESIGN">SIDE_DESIGN</option>
+                                                <option value="person_details">PERSON-DETAILS</option>
                             </select>
                         </div>
                         <div class="form-group col-seq-sm">
