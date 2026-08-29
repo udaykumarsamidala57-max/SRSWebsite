@@ -19,14 +19,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Builder | Enterprise Control Panel</title>
-    <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- External CSS -->
     <link rel="stylesheet" href="<c:url value='/css/page.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
-    <!-- External JS -->
+    <style>
+        /* Expand / Collapse & Sub-slug Specific Inline Extensions */
+        .tree-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--slds-text-weak, #706e6b);
+            padding: 2px 6px;
+            margin-right: 4px;
+            border-radius: 4px;
+            transition: background-color 0.15s ease;
+        }
+        .tree-toggle-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--slds-text-primary, #181818);
+        }
+        .sub-page-row.is-hidden {
+            display: none !important;
+        }
+        .slug-parent-prefix {
+            opacity: 0.65;
+            font-weight: 500;
+        }
+        .sub-page-indent {
+            padding-left: 1.5rem !important;
+        }
+    </style>
     <script type="module" src="<c:url value='/js/index.js'/>" defer></script>
 </head>
 <body>
@@ -48,7 +73,6 @@
 
     <div class="app-container">
         
-        <!-- LEFT SIDEBAR -->
         <aside class="sidebar">
             <div class="slds-card">
                 <div class="slds-card-header">
@@ -63,7 +87,7 @@
                         </div>
                         <div class="form-group">
                             <label for="slug">URL Slug</label>
-                            <input type="text" id="slug" name="slug" required placeholder="e.g. home">
+                            <input type="text" id="slug" name="slug" required placeholder="e.g. home or sub-path">
                         </div>
                         <div class="form-group">
                             <label for="parentId">Parent Page (Sub-Navigation)</label>
@@ -71,7 +95,7 @@
                                 <option value="">-- None (Top Level Menu) --</option>
                                 <c:forEach var="p" items="${pages}">
                                     <c:if test="${empty p.parentId}">
-                                        <option value="${p.id}">${fn:escapeXml(p.title)}</option>
+                                        <option value="${p.id}">${fn:escapeXml(p.title)} (/${fn:escapeXml(p.slug)})</option>
                                     </c:if>
                                 </c:forEach>
                             </select>
@@ -81,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- PROFESSIONALLY ALIGNED PAGES DIRECTORY -->
             <div class="slds-card">
                 <div class="slds-card-header">
                     <h3>Pages Directory</h3>
@@ -98,11 +121,27 @@
                             <tbody>
                                 <c:forEach var="p" items="${pages}">
                                     <c:if test="${empty p.parentId}">
-                                        <!-- Root Page Row -->
-                                        <tr>
+                                        <c:set var="subCount" value="0" />
+                                        <c:forEach var="chk" items="${pages}">
+                                            <c:if test="${chk.parentId == p.id}">
+                                                <c:set var="subCount" value="${subCount + 1}" />
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <tr class="root-page-row">
                                             <td>
                                                 <div class="page-title-block">
                                                     <span class="page-name">
+                                                        <c:choose>
+                                                            <c:when test="${subCount > 0}">
+                                                                <button type="button" class="tree-toggle-btn" data-toggle-target="group-${p.id}">
+                                                                    ▶
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span style="display:inline-block; width: 18px;"></span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                         <span class="badge-nav-root">Root</span>
                                                         ${fn:escapeXml(p.title)}
                                                     </span>
@@ -125,18 +164,19 @@
                                             </td>
                                         </tr>
 
-                                        <!-- Sub-Navigation Children Rows -->
                                         <c:forEach var="sub" items="${pages}">
                                             <c:if test="${sub.parentId == p.id}">
-                                                <tr class="sub-page-row">
-                                                    <td class="sub-page-cell">
+                                                <tr class="sub-page-row is-hidden child-group-${p.id}">
+                                                    <td class="sub-page-cell sub-page-indent">
                                                         <div class="page-title-block">
                                                             <span class="page-name">
                                                                 <span class="tree-connector">↳</span>
                                                                 <span class="badge-nav-sub">Sub</span>
                                                                 ${fn:escapeXml(sub.title)}
                                                             </span>
-                                                            <code class="slug-pill">/${fn:escapeXml(sub.slug)}</code>
+                                                            <code class="slug-pill">
+                                                                <span class="slug-parent-prefix">/${fn:escapeXml(p.slug)}</span>/${fn:escapeXml(sub.slug)}
+                                                            </code>
                                                         </div>
                                                     </td>
                                                     <td class="align-right">
@@ -165,7 +205,6 @@
             </div>
         </aside>
 
-        <!-- MAIN WORKSPACE -->
         <main class="main-content">
             <c:choose>
                 <c:when test="${not empty activePage}">
@@ -189,7 +228,6 @@
                             </button>
                         </div>
                         <div class="slds-card-body">
-                            <!-- ADD SECTION FORM -->
                             <div class="nested-form-block solid-border">
                                 <h4 class="sub-header">Add New Section Block</h4>
                                 <form action="pages" method="post">
@@ -232,7 +270,6 @@
                         </div>
                     </div>
 
-                    <!-- SECTIONS LOOP -->
                     <c:forEach var="sec" items="${activePage.sections}">
                         <div class="section-card" id="section-${sec.id}">
                             <div class="section-header">
@@ -304,7 +341,6 @@
                                     </c:forEach>
                                 </div>
 
-                                <!-- UPLOAD ASSET FORM -->
                                 <div class="nested-form-block">
                                     <form action="pages?action=uploadImage" method="post" enctype="multipart/form-data">
                                         <input type="hidden" name="pageId" value="${activePage.id}">
@@ -347,7 +383,6 @@
                     
                 </c:when>
                 <c:otherwise>
-                    <!-- EMPTY STATE WHEN NO PAGE IS SELECTED -->
                     <div class="slds-card">
                         <div class="slds-card-body empty-state">
                             <h3>No Page Selected</h3>
@@ -358,7 +393,6 @@
             </c:choose>
         </main>
 
-        <!-- RIGHT STICKY NAVIGATION SIDEBAR -->
         <c:if test="${not empty activePage and not empty activePage.sections}">
             <aside class="page-nav-sidebar">
                 <div class="slds-card">
@@ -389,7 +423,6 @@
 
     </div>
 
-    <!-- MODAL: EDIT PAGE DETAILS -->
     <div class="modal-backdrop" id="editPageModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -413,7 +446,7 @@
                         <select id="editParentId" name="parentId">
                             <option value="">-- None (Top Level Menu) --</option>
                             <c:forEach var="p" items="${pages}">
-                                <option value="${p.id}">${fn:escapeXml(p.title)}</option>
+                                <option value="${p.id}">${fn:escapeXml(p.title)} (/${fn:escapeXml(p.slug)})</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -426,7 +459,6 @@
         </div>
     </div>
 
-    <!-- MODAL: EDIT SECTION -->
     <div class="modal-backdrop" id="editSectionModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -443,12 +475,12 @@
                             <label for="editSectionType">Type</label>
                             <select id="editSectionType" name="sectionType">
                                 <option value="hero">Hero</option>
-                                                <option value="DISTINCT">DISTINCT</option>
-                                                <option value="DESC">DESC</option>
-                                                <option value="DESC2">DESC2</option>
-                                                <option value="DESC3">DESC3</option>
-                                                <option value="SIDE_DESIGN">SIDE_DESIGN</option>
-                                                <option value="person_details">PERSON-DETAILS</option>
+                                <option value="DISTINCT">DISTINCT</option>
+                                <option value="DESC">DESC</option>
+                                <option value="DESC2">DESC2</option>
+                                <option value="DESC3">DESC3</option>
+                                <option value="SIDE_DESIGN">SIDE_DESIGN</option>
+                                <option value="person_details">PERSON-DETAILS</option>
                             </select>
                         </div>
                         <div class="form-group col-seq-sm">
@@ -473,7 +505,6 @@
         </div>
     </div>
 
-    <!-- MODAL: EDIT IMAGE METADATA -->
     <div class="modal-backdrop" id="editImageModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -514,5 +545,28 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleBtns = document.querySelectorAll('.tree-toggle-btn');
+            toggleBtns.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var targetClass = btn.getAttribute('data-toggle-target');
+                    var rows = document.querySelectorAll('.' + 'child-' + targetClass);
+                    
+                    var isCollapsed = btn.innerText.trim() === '▶';
+                    btn.innerText = isCollapsed ? '▼' : '▶';
+                    
+                    rows.forEach(function(row) {
+                        if (isCollapsed) {
+                            row.classList.remove('is-hidden');
+                        } else {
+                            row.classList.add('is-hidden');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
