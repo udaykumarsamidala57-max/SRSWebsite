@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DBUtil {
 
     private static final String USER = "root";
-    private static final String PASSWORD = "vSZVibKCzvcovcGjaLlxrTddrjiNPVQn";
+    private static final String PASSWORD = "aGqMEJvhAhoDWKXRPxxdYJXMNlbFmhBr";
 
     static {
         try {
@@ -23,7 +23,7 @@ public class DBUtil {
 
         if ("SRS".equalsIgnoreCase(branch)) {
 
-            url = "jdbc:mysql://shuttle.proxy.rlwy.net:26985/website"
+            url = "jdbc:mysql://altaria.proxy.rlwy.net:54307/website"   
                     + "?useSSL=false"
                     + "&allowPublicKeyRetrieval=true"
                     + "&serverTimezone=UTC"

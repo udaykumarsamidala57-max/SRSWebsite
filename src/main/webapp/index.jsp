@@ -306,7 +306,19 @@
                                             <span class="badge badge-overlay">Seq ${img.sequenceOrder}</span>
                                             
                                             <div class="img-container">
-                                                <img src="pages?action=renderImage&imageId=${img.id}" alt="${fn:escapeXml(img.altText)}">
+                                                <c:choose>
+                                                    <c:when test="${fn:startsWith(img.imageType, 'video/')}">
+                                                        <video controls preload="metadata">
+                                                            <source src="pages?action=renderImage&imageId=${img.id}"
+                                                                    type="${fn:escapeXml(img.imageType)}">
+                                                            Your browser does not support video.
+                                                        </video>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="pages?action=renderImage&imageId=${img.id}"
+                                                             alt="${fn:escapeXml(img.altText)}">
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
 
                                             <c:if test="${not empty img.heading1 or not empty img.heading2}">
@@ -349,7 +361,7 @@
                                         <div class="form-row">
                                             <div class="form-group col-file">
                                                 <label>Select File</label>
-                                                <input type="file" name="imageFile" accept="image/*" required>
+                                                <input type="file" name="imageFile" accept="image/*,video/*" required>
                                             </div>
                                             <div class="form-group col-alt">
                                                 <label>Heading 1</label>
@@ -526,10 +538,10 @@
                             <input type="text" id="editImageH2" name="heading2">
                         </div>
                     </div>
-                    <div class="form-row" style="margin-top:0.35rem;">
+                    <div class="form-row" style="margin-top: 0.35rem;">
                         <div class="form-group col-alt" style="flex: 1;">
                             <label for="editImageAlt">Alt Text / Description</label>
-                            <textarea id="editImageAlt" name="altText" rows="3" placeholder="Image description..." style="width: 100%; resize: vertical;"></textarea>
+                            <textarea id="editImageAlt" name="altText" rows="3" style="width: 100%; resize: vertical;"></textarea>
                         </div>
                         <div class="form-group col-seq-xs">
                             <label for="editImageSeq">Seq #</label>
@@ -539,34 +551,132 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-neutral" onclick="closeModal('editImageModal')">Cancel</button>
-                    <button type="submit" class="btn btn-brand">Save Asset</button>
+                    <button type="submit" class="btn btn-brand">Save Metadata</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var toggleBtns = document.querySelectorAll('.tree-toggle-btn');
-            toggleBtns.forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var targetClass = btn.getAttribute('data-toggle-target');
-                    var rows = document.querySelectorAll('.' + 'child-' + targetClass);
-                    
-                    var isCollapsed = btn.innerText.trim() === '▶';
-                    btn.innerText = isCollapsed ? '▼' : '▶';
-                    
-                    rows.forEach(function(row) {
-                        if (isCollapsed) {
-                            row.classList.remove('is-hidden');
-                        } else {
-                            row.classList.add('is-hidden');
-                        }
-                    });
-                });
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ==========================================
+    // 1. PAGE TREE EXPAND / COLLAPSE TOGGLE
+    // ==========================================
+    var toggleBtns = document.querySelectorAll('.tree-toggle-btn');
+    toggleBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetClass = btn.getAttribute('data-toggle-target');
+            var rows = document.querySelectorAll('.' + 'child-' + targetClass);
+            
+            var isCollapsed = btn.innerText.trim() === '▶';
+            btn.innerText = isCollapsed ? '▼' : '▶';
+            
+            rows.forEach(function(row) {
+                if (isCollapsed) {
+                    row.classList.remove('is-hidden');
+                } else {
+                    row.classList.add('is-hidden');
+                }
             });
         });
-    </script>
-</body>
+    });
+
+    // ==========================================
+    // 2. MODAL HELPER FUNCTIONS
+    // ==========================================
+    window.openModal = function(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    };
+
+    window.closeModal = function(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+        backdrop.addEventListener('click', function(e) {
+            if (e.target === backdrop) {
+                backdrop.style.display = 'none';
+            }
+        });
+    });
+
+    // ==========================================
+    // 3. EDIT PAGE DETAILS MODAL
+    // ==========================================
+    document.querySelectorAll('.btn-edit-page').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var pageId = btn.getAttribute('data-id') || '';
+            var title = btn.getAttribute('data-title') || '';
+            var slug = btn.getAttribute('data-slug') || '';
+            var parentId = btn.getAttribute('data-parent-id') || '';
+
+            document.getElementById('editPageId').value = pageId;
+            document.getElementById('editPageTitle').value = title;
+            document.getElementById('editPageSlug').value = slug;
+            
+            var parentSelect = document.getElementById('editParentId');
+            if (parentSelect) {
+                parentSelect.value = parentId;
+            }
+
+            openModal('editPageModal');
+        });
+    });
+
+    // ==========================================
+    // 4. EDIT SECTION BLOCK MODAL
+    // ==========================================
+    document.querySelectorAll('.btn-edit-section').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var sectionId = btn.getAttribute('data-id') || '';
+            var type = btn.getAttribute('data-type') || '';
+            var seq = btn.getAttribute('data-seq') || '1';
+            var title = btn.getAttribute('data-title') || '';
+            
+            // Fetch content stored in hidden container to preserve line breaks
+            var contentStore = document.getElementById('section-content-data-' + sectionId);
+            var content = contentStore ? contentStore.innerText : '';
+
+            document.getElementById('editSectionId').value = sectionId;
+            document.getElementById('editSectionType').value = type;
+            document.getElementById('editSectionSeq').value = seq;
+            document.getElementById('editSectionTitle').value = title;
+            document.getElementById('editSectionContent').value = content;
+
+            openModal('editSectionModal');
+        });
+    });
+
+    // ==========================================
+    // 5. EDIT ASSET METADATA MODAL
+    // ==========================================
+    document.querySelectorAll('.btn-edit-image').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var imageId = btn.getAttribute('data-id') || '';
+            var seq = btn.getAttribute('data-seq') || '1';
+            var alt = btn.getAttribute('data-alt') || '';
+            var h1 = btn.getAttribute('data-h1') || '';
+            var h2 = btn.getAttribute('data-h2') || '';
+
+            document.getElementById('editImageId').value = imageId;
+            document.getElementById('editImageSeq').value = seq;
+            document.getElementById('editImageAlt').value = alt;
+            document.getElementById('editImageH1').value = h1;
+            document.getElementById('editImageH2').value = h2;
+
+            openModal('editImageModal');
+        });
+    });
+
+});
+</script>
 </html>
