@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 public class LoginServlet extends HttpServlet {
 
     private static final String URL =
-            "jdbc:mysql://jdbc:mysql://altaria.proxy.rlwy.net:53217/website?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&tcpKeepAlive=true";
+            "jdbc:mysql://altaria.proxy.rlwy.net:53217/website?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&tcpKeepAlive=true";
 
     private static final String USER = "root";
     private static final String PASSWORD = "fSPcwMERVlpBdtrGEzxQwKjqYiXqTeWU";
