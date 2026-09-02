@@ -19,15 +19,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Builder | Enterprise Control Panel</title>
-    <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- External CSS -->
-    <!-- External CSS -->
     <link rel="stylesheet" href="<c:url value='/css/page.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/index.css'/>">
-    <!-- External JS -->
+    <style>
+        /* Expand / Collapse & Sub-slug Specific Inline Extensions */
+        .tree-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--slds-text-weak, #706e6b);
+            padding: 2px 6px;
+            margin-right: 4px;
+            border-radius: 4px;
+            transition: background-color 0.15s ease;
+        }
+        .tree-toggle-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--slds-text-primary, #181818);
+        }
+        .sub-page-row.is-hidden {
+            display: none !important;
+        }
+        .slug-parent-prefix {
+            opacity: 0.65;
+            font-weight: 500;
+        }
+        .sub-page-indent {
+            padding-left: 1.5rem !important;
+        }
+    </style>
     <script type="module" src="<c:url value='/js/index.js'/>" defer></script>
 </head>
 <body>
@@ -49,7 +73,6 @@
 
     <div class="app-container">
         
-        <!-- LEFT SIDEBAR -->
         <aside class="sidebar">
             <div class="slds-card">
                 <div class="slds-card-header">
@@ -64,7 +87,7 @@
                         </div>
                         <div class="form-group">
                             <label for="slug">URL Slug</label>
-                            <input type="text" id="slug" name="slug" required placeholder="e.g. home">
+                            <input type="text" id="slug" name="slug" required placeholder="e.g. home or sub-path">
                         </div>
                         <div class="form-group">
                             <label for="parentId">Parent Page (Sub-Navigation)</label>
@@ -72,7 +95,7 @@
                                 <option value="">-- None (Top Level Menu) --</option>
                                 <c:forEach var="p" items="${pages}">
                                     <c:if test="${empty p.parentId}">
-                                        <option value="${p.id}">${fn:escapeXml(p.title)}</option>
+                                        <option value="${p.id}">${fn:escapeXml(p.title)} (/${fn:escapeXml(p.slug)})</option>
                                     </c:if>
                                 </c:forEach>
                             </select>
@@ -82,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- PROFESSIONALLY ALIGNED PAGES DIRECTORY -->
             <div class="slds-card">
                 <div class="slds-card-header">
                     <h3>Pages Directory</h3>
@@ -99,11 +121,27 @@
                             <tbody>
                                 <c:forEach var="p" items="${pages}">
                                     <c:if test="${empty p.parentId}">
-                                        <!-- Root Page Row -->
-                                        <tr>
+                                        <c:set var="subCount" value="0" />
+                                        <c:forEach var="chk" items="${pages}">
+                                            <c:if test="${chk.parentId == p.id}">
+                                                <c:set var="subCount" value="${subCount + 1}" />
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <tr class="root-page-row">
                                             <td>
                                                 <div class="page-title-block">
                                                     <span class="page-name">
+                                                        <c:choose>
+                                                            <c:when test="${subCount > 0}">
+                                                                <button type="button" class="tree-toggle-btn" data-toggle-target="group-${p.id}">
+                                                                    ▶
+                                                                </button>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span style="display:inline-block; width: 18px;"></span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                         <span class="badge-nav-root">Root</span>
                                                         ${fn:escapeXml(p.title)}
                                                     </span>
@@ -126,18 +164,19 @@
                                             </td>
                                         </tr>
 
-                                        <!-- Sub-Navigation Children Rows -->
                                         <c:forEach var="sub" items="${pages}">
                                             <c:if test="${sub.parentId == p.id}">
-                                                <tr class="sub-page-row">
-                                                    <td class="sub-page-cell">
+                                                <tr class="sub-page-row is-hidden child-group-${p.id}">
+                                                    <td class="sub-page-cell sub-page-indent">
                                                         <div class="page-title-block">
                                                             <span class="page-name">
                                                                 <span class="tree-connector">↳</span>
                                                                 <span class="badge-nav-sub">Sub</span>
                                                                 ${fn:escapeXml(sub.title)}
                                                             </span>
-                                                            <code class="slug-pill">/${fn:escapeXml(sub.slug)}</code>
+                                                            <code class="slug-pill">
+                                                                <span class="slug-parent-prefix">/${fn:escapeXml(p.slug)}</span>/${fn:escapeXml(sub.slug)}
+                                                            </code>
                                                         </div>
                                                     </td>
                                                     <td class="align-right">
@@ -166,7 +205,6 @@
             </div>
         </aside>
 
-        <!-- MAIN WORKSPACE -->
         <main class="main-content">
             <c:choose>
                 <c:when test="${not empty activePage}">
@@ -190,7 +228,6 @@
                             </button>
                         </div>
                         <div class="slds-card-body">
-                            <!-- ADD SECTION FORM -->
                             <div class="nested-form-block solid-border">
                                 <h4 class="sub-header">Add New Section Block</h4>
                                 <form action="pages" method="post">
@@ -204,7 +241,9 @@
                                                 <option value="hero">Hero</option>
                                                 <option value="DISTINCT">DISTINCT</option>
                                                 <option value="DESC">DESC</option>
-                                                <option value="DESC">DESC2</option>
+                                                <option value="DESC2">DESC2</option>
+                                                <option value="DESC3">DESC3</option>
+                                                <option value="SIDE_DESIGN">SIDE_DESIGN</option>
                                                 <option value="person_details">PERSON-DETAILS</option>
                                             </select>
                                         </div>
@@ -231,7 +270,6 @@
                         </div>
                     </div>
 
-                    <!-- SECTIONS LOOP -->
                     <c:forEach var="sec" items="${activePage.sections}">
                         <div class="section-card" id="section-${sec.id}">
                             <div class="section-header">
@@ -268,7 +306,19 @@
                                             <span class="badge badge-overlay">Seq ${img.sequenceOrder}</span>
                                             
                                             <div class="img-container">
-                                                <img src="pages?action=renderImage&imageId=${img.id}" alt="${fn:escapeXml(img.altText)}">
+                                                <c:choose>
+                                                    <c:when test="${fn:startsWith(img.imageType, 'video/')}">
+                                                        <video controls preload="metadata">
+                                                            <source src="pages?action=renderImage&imageId=${img.id}"
+                                                                    type="${fn:escapeXml(img.imageType)}">
+                                                            Your browser does not support video.
+                                                        </video>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="pages?action=renderImage&imageId=${img.id}"
+                                                             alt="${fn:escapeXml(img.altText)}">
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
 
                                             <c:if test="${not empty img.heading1 or not empty img.heading2}">
@@ -303,7 +353,6 @@
                                     </c:forEach>
                                 </div>
 
-                                <!-- UPLOAD ASSET FORM -->
                                 <div class="nested-form-block">
                                     <form action="pages?action=uploadImage" method="post" enctype="multipart/form-data">
                                         <input type="hidden" name="pageId" value="${activePage.id}">
@@ -312,7 +361,7 @@
                                         <div class="form-row">
                                             <div class="form-group col-file">
                                                 <label>Select File</label>
-                                                <input type="file" name="imageFile" accept="image/*" required>
+                                                <input type="file" name="imageFile" accept="image/*,video/*" required>
                                             </div>
                                             <div class="form-group col-alt">
                                                 <label>Heading 1</label>
@@ -325,15 +374,15 @@
                                         </div>
 
                                         <div class="form-row" style="margin-top:0.35rem;">
-                                            <div class="form-group col-alt">
-                                                <label>Alt Text / Description</label>
-                                                <input type="text" name="altText" placeholder="Image description">
+                                            <div class="form-group col-alt" style="flex: 1;">
+                                                <label for="uploadAltText">Alt Text / Description</label>
+                                                <textarea id="uploadAltText" name="altText" rows="3" placeholder="Image description..." style="width: 100%; resize: vertical;"></textarea>
                                             </div>
                                             <div class="form-group col-seq-xs">
                                                 <label>Seq #</label>
                                                 <input type="number" name="sequenceOrder" value="1" min="1" required>
                                             </div>
-                                            <div style="margin-bottom:0.75rem;">
+                                            <div style="margin-bottom:0.75rem; align-self: flex-end;">
                                                 <button type="submit" class="btn btn-neutral">Upload Asset</button>
                                             </div>
                                         </div>
@@ -346,7 +395,6 @@
                     
                 </c:when>
                 <c:otherwise>
-                    <!-- EMPTY STATE WHEN NO PAGE IS SELECTED -->
                     <div class="slds-card">
                         <div class="slds-card-body empty-state">
                             <h3>No Page Selected</h3>
@@ -357,7 +405,6 @@
             </c:choose>
         </main>
 
-        <!-- RIGHT STICKY NAVIGATION SIDEBAR -->
         <c:if test="${not empty activePage and not empty activePage.sections}">
             <aside class="page-nav-sidebar">
                 <div class="slds-card">
@@ -388,7 +435,6 @@
 
     </div>
 
-    <!-- MODAL: EDIT PAGE DETAILS -->
     <div class="modal-backdrop" id="editPageModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -412,7 +458,7 @@
                         <select id="editParentId" name="parentId">
                             <option value="">-- None (Top Level Menu) --</option>
                             <c:forEach var="p" items="${pages}">
-                                <option value="${p.id}">${fn:escapeXml(p.title)}</option>
+                                <option value="${p.id}">${fn:escapeXml(p.title)} (/${fn:escapeXml(p.slug)})</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -425,7 +471,6 @@
         </div>
     </div>
 
-    <!-- MODAL: EDIT SECTION -->
     <div class="modal-backdrop" id="editSectionModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -442,8 +487,11 @@
                             <label for="editSectionType">Type</label>
                             <select id="editSectionType" name="sectionType">
                                 <option value="hero">Hero</option>
-                                <option value="district">District</option>
+                                <option value="DISTINCT">DISTINCT</option>
                                 <option value="DESC">DESC</option>
+                                <option value="DESC2">DESC2</option>
+                                <option value="DESC3">DESC3</option>
+                                <option value="SIDE_DESIGN">SIDE_DESIGN</option>
                                 <option value="person_details">PERSON-DETAILS</option>
                             </select>
                         </div>
@@ -469,7 +517,6 @@
         </div>
     </div>
 
-    <!-- MODAL: EDIT IMAGE METADATA -->
     <div class="modal-backdrop" id="editImageModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -491,10 +538,10 @@
                             <input type="text" id="editImageH2" name="heading2">
                         </div>
                     </div>
-                    <div class="form-row" style="margin-top:0.35rem;">
-                        <div class="form-group col-alt">
+                    <div class="form-row" style="margin-top: 0.35rem;">
+                        <div class="form-group col-alt" style="flex: 1;">
                             <label for="editImageAlt">Alt Text / Description</label>
-                            <input type="text" id="editImageAlt" name="altText">
+                            <textarea id="editImageAlt" name="altText" rows="3" style="width: 100%; resize: vertical;"></textarea>
                         </div>
                         <div class="form-group col-seq-xs">
                             <label for="editImageSeq">Seq #</label>
@@ -504,11 +551,132 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-neutral" onclick="closeModal('editImageModal')">Cancel</button>
-                    <button type="submit" class="btn btn-brand">Save Asset</button>
+                    <button type="submit" class="btn btn-brand">Save Metadata</button>
                 </div>
             </form>
         </div>
     </div>
-
 </body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ==========================================
+    // 1. PAGE TREE EXPAND / COLLAPSE TOGGLE
+    // ==========================================
+    var toggleBtns = document.querySelectorAll('.tree-toggle-btn');
+    toggleBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetClass = btn.getAttribute('data-toggle-target');
+            var rows = document.querySelectorAll('.' + 'child-' + targetClass);
+            
+            var isCollapsed = btn.innerText.trim() === '▶';
+            btn.innerText = isCollapsed ? '▼' : '▶';
+            
+            rows.forEach(function(row) {
+                if (isCollapsed) {
+                    row.classList.remove('is-hidden');
+                } else {
+                    row.classList.add('is-hidden');
+                }
+            });
+        });
+    });
+
+    // ==========================================
+    // 2. MODAL HELPER FUNCTIONS
+    // ==========================================
+    window.openModal = function(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    };
+
+    window.closeModal = function(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+        backdrop.addEventListener('click', function(e) {
+            if (e.target === backdrop) {
+                backdrop.style.display = 'none';
+            }
+        });
+    });
+
+    // ==========================================
+    // 3. EDIT PAGE DETAILS MODAL
+    // ==========================================
+    document.querySelectorAll('.btn-edit-page').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var pageId = btn.getAttribute('data-id') || '';
+            var title = btn.getAttribute('data-title') || '';
+            var slug = btn.getAttribute('data-slug') || '';
+            var parentId = btn.getAttribute('data-parent-id') || '';
+
+            document.getElementById('editPageId').value = pageId;
+            document.getElementById('editPageTitle').value = title;
+            document.getElementById('editPageSlug').value = slug;
+            
+            var parentSelect = document.getElementById('editParentId');
+            if (parentSelect) {
+                parentSelect.value = parentId;
+            }
+
+            openModal('editPageModal');
+        });
+    });
+
+    // ==========================================
+    // 4. EDIT SECTION BLOCK MODAL
+    // ==========================================
+    document.querySelectorAll('.btn-edit-section').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var sectionId = btn.getAttribute('data-id') || '';
+            var type = btn.getAttribute('data-type') || '';
+            var seq = btn.getAttribute('data-seq') || '1';
+            var title = btn.getAttribute('data-title') || '';
+            
+            // Fetch content stored in hidden container to preserve line breaks
+            var contentStore = document.getElementById('section-content-data-' + sectionId);
+            var content = contentStore ? contentStore.innerText : '';
+
+            document.getElementById('editSectionId').value = sectionId;
+            document.getElementById('editSectionType').value = type;
+            document.getElementById('editSectionSeq').value = seq;
+            document.getElementById('editSectionTitle').value = title;
+            document.getElementById('editSectionContent').value = content;
+
+            openModal('editSectionModal');
+        });
+    });
+
+    // ==========================================
+    // 5. EDIT ASSET METADATA MODAL
+    // ==========================================
+    document.querySelectorAll('.btn-edit-image').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var imageId = btn.getAttribute('data-id') || '';
+            var seq = btn.getAttribute('data-seq') || '1';
+            var alt = btn.getAttribute('data-alt') || '';
+            var h1 = btn.getAttribute('data-h1') || '';
+            var h2 = btn.getAttribute('data-h2') || '';
+
+            document.getElementById('editImageId').value = imageId;
+            document.getElementById('editImageSeq').value = seq;
+            document.getElementById('editImageAlt').value = alt;
+            document.getElementById('editImageH1').value = h1;
+            document.getElementById('editImageH2').value = h2;
+
+            openModal('editImageModal');
+        });
+    });
+
+});
+</script>
 </html>

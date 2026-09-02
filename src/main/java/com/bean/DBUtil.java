@@ -7,7 +7,10 @@ import java.sql.SQLException;
 public class DBUtil {
 
     private static final String USER = "root";
-    private static final String PASSWORD = "aGqMEJvhAhoDWKXRPxxdYJXMNlbFmhBr";
+
+    // Branch-specific passwords
+    private static final String PASSWORD_SRS = "fSPcwMERVlpBdtrGEzxQwKjqYiXqTeWU";
+    private static final String PASSWORD_SANPOLY = "WVoVoSyYjGfAPHBNgxmDmcblbcHjbVYk";
 
     static {
         try {
@@ -20,27 +23,32 @@ public class DBUtil {
     public static Connection getConnection(String branch) throws SQLException {
 
         String url;
+        String password;
 
         if ("SRS".equalsIgnoreCase(branch)) {
 
-            url = "jdbc:mysql://altaria.proxy.rlwy.net:54307/website"   
+            url = "jdbc:mysql://altaria.proxy.rlwy.net:53217/website"   
                     + "?useSSL=false"
                     + "&allowPublicKeyRetrieval=true"
                     + "&serverTimezone=UTC"
                     + "&tcpKeepAlive=true";
+            
+            password = PASSWORD_SRS;
 
         } else if ("Sanpoly".equalsIgnoreCase(branch)) {
 
-            url = "jdbc:mysql://shuttle.proxy.rlwy.net:26985/SanWeb"
+            url = "jdbc:mysql://altaria.proxy.rlwy.net:41400/SanWeb"
                     + "?useSSL=false"
                     + "&allowPublicKeyRetrieval=true"
                     + "&serverTimezone=UTC"
                     + "&tcpKeepAlive=true";
+
+            password = PASSWORD_SANPOLY;
 
         } else {
             throw new SQLException("Invalid Branch: " + branch);
         }
 
-        return DriverManager.getConnection(url, USER, PASSWORD);
+        return DriverManager.getConnection(url, USER, password);
     }
 }
