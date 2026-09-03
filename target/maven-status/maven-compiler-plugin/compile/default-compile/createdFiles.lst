@@ -7,4 +7,5 @@ com\servlet\HomePageServlet.class
 com\servlet\LoginServlet.class
 com\bean\DBUtil.class
 com\servlet\PageServlet.class
+com\servlet\LatestNewsServlet.class
 com\servlet\NavigationServlet.class
