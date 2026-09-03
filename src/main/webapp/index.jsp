@@ -142,16 +142,23 @@
 <body class="min-h-screen flex flex-col antialiased selection:bg-sap-blue selection:text-white">
 
     <!-- Header Navbar (SAP Shell Bar Style) -->
-    <header class="sticky top-0 z-40 w-full bg-sap-header text-white px-6 py-3 shadow-md flex items-center justify-between">
+<header class="sticky top-0 z-40 w-full bg-sap-header text-white px-6 py-3 shadow-md flex items-center justify-between">
         <div class="flex items-center gap-3">
-            
             <div>
                 <h1 class="text-base font-semibold tracking-tight leading-none text-white">Dynamic Page Builder</h1>
-                
             </div>
         </div>
         
         <div class="flex items-center gap-4 text-xs">
+            <!-- Added Link to LatestNewsServlet with Context Path -->
+            <a href="<c:url value='/LatestNewsServlet'/>" 
+               class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-slate-700/60 hover:bg-slate-600 border border-slate-600/80 text-white font-semibold transition-colors">
+                <svg class="w-3.5 h-3.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+                <span>Latest News</span>
+            </a>
+
             <div class="hidden md:flex items-center gap-2 bg-slate-700/60 border border-slate-600/80 px-3 py-1.5 rounded text-slate-200">
                 <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span>User: <strong class="text-white font-semibold">${fn:escapeXml(user)}</strong></span>
