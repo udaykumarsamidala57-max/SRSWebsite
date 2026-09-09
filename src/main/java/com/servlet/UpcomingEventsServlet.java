@@ -94,7 +94,7 @@ public class UpcomingEventsServlet extends HttpServlet {
     }
 
     // -------------------------------------------------------------------------
-    // POST: Insert New Event
+    // POST: Router for Insert, Update, and Delete Actions
     // -------------------------------------------------------------------------
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -106,9 +106,33 @@ public class UpcomingEventsServlet extends HttpServlet {
             return;
         }
 
-        String branch = (String) sess.getAttribute("branch");
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "insert";
+        }
 
-        // 1. Retrieve Form Fields
+        switch (action.toLowerCase()) {
+            case "update":
+                handleUpdate(request);
+                break;
+            case "delete":
+                handleDelete(request);
+                break;
+            case "insert":
+            default:
+                handleInsert(request);
+                break;
+        }
+
+        // Re-load dataset and forward back to the view
+        doGet(request, response);
+    }
+
+    // -------------------------------------------------------------------------
+    // Handler: Insert New Event
+    // -------------------------------------------------------------------------
+    private void handleInsert(HttpServletRequest request) throws ServletException, IOException {
+        String branch = (String) request.getSession().getAttribute("branch");
         String eventDateStr = request.getParameter("event_date");
         String eventName = request.getParameter("event_name");
         String timeFromStr = request.getParameter("time_from");
@@ -117,35 +141,21 @@ public class UpcomingEventsServlet extends HttpServlet {
         String eventDescription = request.getParameter("event_description");
         Part imagePart = request.getPart("image_blob");
 
-        // 2. Insert Query
         String sql = "INSERT INTO upcoming_events (event_date, event_name, time_from, time_to, place, event_description, image_blob) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection(branch);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Required Fields
-            ps.setDate(1, Date.valueOf(eventDateStr)); // Format: YYYY-MM-DD
+            ps.setDate(1, Date.valueOf(eventDateStr));
             ps.setString(2, eventName);
 
-            // Optional Time Fields (Convert "HH:mm" to java.sql.Time or set NULL)
-            if (timeFromStr != null && !timeFromStr.trim().isEmpty()) {
-                ps.setTime(3, Time.valueOf(timeFromStr.length() == 5 ? timeFromStr + ":00" : timeFromStr));
-            } else {
-                ps.setNull(3, Types.TIME);
-            }
+            setTimeParameter(ps, 3, timeFromStr);
+            setTimeParameter(ps, 4, timeToStr);
 
-            if (timeToStr != null && !timeToStr.trim().isEmpty()) {
-                ps.setTime(4, Time.valueOf(timeToStr.length() == 5 ? timeToStr + ":00" : timeToStr));
-            } else {
-                ps.setNull(4, Types.TIME);
-            }
-
-            // Optional Text Fields
             ps.setString(5, (place != null && !place.trim().isEmpty()) ? place : null);
             ps.setString(6, (eventDescription != null && !eventDescription.trim().isEmpty()) ? eventDescription : null);
 
-            // Image Binary Stream (Mediumblob)
             if (imagePart != null && imagePart.getSize() > 0) {
                 ps.setBinaryStream(7, imagePart.getInputStream(), (int) imagePart.getSize());
             } else {
@@ -154,29 +164,105 @@ public class UpcomingEventsServlet extends HttpServlet {
 
             int rowsInserted = ps.executeUpdate();
             if (rowsInserted > 0) {
-                request.setAttribute("successMessage", "Event added successfully!");
+                request.setAttribute("successMessage", "Event created successfully!");
             } else {
-                request.setAttribute("errorMessage", "Failed to add event.");
+                request.setAttribute("errorMessage", "Failed to create event.");
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException | IllegalArgumentException e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Database error: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Invalid date/time format submitted.");
+            request.setAttribute("errorMessage", "Error saving record: " + e.getMessage());
         }
-
-        // Re-load the list and return to the page
-        doGet(request, response);
     }
 
-    private boolean isAuthorized(String role) {
-        if (role == null) {
-            return false;
+    // -------------------------------------------------------------------------
+    // Handler: Update Existing Event
+    // -------------------------------------------------------------------------
+    private void handleUpdate(HttpServletRequest request) throws ServletException, IOException {
+        String branch = (String) request.getSession().getAttribute("branch");
+        String idStr = request.getParameter("id");
+        String eventDateStr = request.getParameter("event_date");
+        String eventName = request.getParameter("event_name");
+        String timeFromStr = request.getParameter("time_from");
+        String timeToStr = request.getParameter("time_to");
+        String place = request.getParameter("place");
+        String eventDescription = request.getParameter("event_description");
+        Part imagePart = request.getPart("image_blob");
+
+        boolean hasNewImage = (imagePart != null && imagePart.getSize() > 0);
+
+        String sql = hasNewImage
+            ? "UPDATE upcoming_events SET event_date=?, event_name=?, time_from=?, time_to=?, place=?, event_description=?, image_blob=? WHERE id=?"
+            : "UPDATE upcoming_events SET event_date=?, event_name=?, time_from=?, time_to=?, place=?, event_description=? WHERE id=?";
+
+        try (Connection conn = DBUtil.getConnection(branch);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int id = Integer.parseInt(idStr);
+
+            ps.setDate(1, Date.valueOf(eventDateStr));
+            ps.setString(2, eventName);
+
+            setTimeParameter(ps, 3, timeFromStr);
+            setTimeParameter(ps, 4, timeToStr);
+
+            ps.setString(5, (place != null && !place.trim().isEmpty()) ? place : null);
+            ps.setString(6, (eventDescription != null && !eventDescription.trim().isEmpty()) ? eventDescription : null);
+
+            if (hasNewImage) {
+                ps.setBinaryStream(7, imagePart.getInputStream(), (int) imagePart.getSize());
+                ps.setInt(8, id);
+            } else {
+                ps.setInt(7, id);
+            }
+
+            int rowsUpdated = ps.executeUpdate();
+            if (rowsUpdated > 0) {
+                request.setAttribute("successMessage", "Event updated successfully!");
+            } else {
+                request.setAttribute("errorMessage", "Failed to update event.");
+            }
+
+        } catch (SQLException | IllegalArgumentException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Error updating record: " + e.getMessage());
         }
-        return role.equalsIgnoreCase("ADMIN") || 
-               role.equalsIgnoreCase("MANAGER") || 
-               role.equalsIgnoreCase("USER");
+    }
+
+    // -------------------------------------------------------------------------
+    // Handler: Delete Event
+    // -------------------------------------------------------------------------
+    private void handleDelete(HttpServletRequest request) {
+        String branch = (String) request.getSession().getAttribute("branch");
+        String idStr = request.getParameter("id");
+
+        String sql = "DELETE FROM upcoming_events WHERE id = ?";
+
+        try (Connection conn = DBUtil.getConnection(branch);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, Integer.parseInt(idStr));
+
+            int rowsDeleted = ps.executeUpdate();
+            if (rowsDeleted > 0) {
+                request.setAttribute("successMessage", "Event deleted successfully!");
+            } else {
+                request.setAttribute("errorMessage", "Event not found or could not be deleted.");
+            }
+
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Error deleting record: " + e.getMessage());
+        }
+    }
+
+    // Helper for time formatting
+    private void setTimeParameter(PreparedStatement ps, int paramIndex, String timeStr) throws SQLException {
+        if (timeStr != null && !timeStr.trim().isEmpty()) {
+            String formattedTime = timeStr.length() == 5 ? timeStr + ":00" : timeStr;
+            ps.setTime(paramIndex, Time.valueOf(formattedTime));
+        } else {
+            ps.setNull(paramIndex, Types.TIME);
+        }
     }
 }

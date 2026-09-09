@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upcoming Events</title>
     
-    <!-- Google Fonts & Salesforce-Style Icons -->
+    <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Salesforce+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,6 +29,8 @@
             --slds-text-muted: #706e6b;
             --slds-radius: 4px;
             --slds-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+            --slds-danger: #ea001e;
+            --slds-danger-hover: #ba001a;
         }
 
         * {
@@ -51,7 +54,7 @@
             padding: 0 16px;
         }
 
-        /* Compact Header Banner */
+        /* Header Banner */
         .page-header {
             background: var(--slds-surface);
             border: 1px solid var(--slds-border);
@@ -106,17 +109,16 @@
         }
         .alert-error {
             background-color: #fef2f2;
-            color: #ea001e;
+            color: var(--slds-danger);
             border: 1px solid #fe8f8f;
         }
         .alert-success {
-            background-color: #eefd2c;
             background-color: #f0fdf4;
             color: #2e844a;
             border: 1px solid #91e0a6;
         }
 
-        /* Form Card */
+        /* Form Cards */
         .form-card {
             background: var(--slds-surface);
             border-radius: var(--slds-radius);
@@ -244,7 +246,6 @@
             cursor: pointer;
             transition: background-color 0.15s ease;
             align-self: flex-end;
-            margin-top: 4px;
         }
 
         .btn-submit:hover {
@@ -259,9 +260,6 @@
             color: var(--slds-text-main);
             text-transform: uppercase;
             letter-spacing: 0.03em;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
         /* Event List & Cards */
@@ -272,7 +270,7 @@
         }
 
         .event-card {
-            background: var(--surface-color);
+            background: var(--slds-surface);
             border-radius: var(--slds-radius);
             padding: 12px 16px;
             box-shadow: var(--slds-shadow);
@@ -280,12 +278,13 @@
             display: flex;
             gap: 16px;
             align-items: flex-start;
+            position: relative;
         }
 
         .event-image-wrapper {
             flex-shrink: 0;
             width: 120px;
-            height: 80px;
+            height: 85px;
             border-radius: var(--slds-radius);
             overflow: hidden;
             background-color: #f3f3f3;
@@ -313,6 +312,7 @@
         .event-details {
             flex: 1;
             min-width: 0;
+            padding-right: 70px; /* Leave room for actions */
         }
 
         .event-title {
@@ -355,6 +355,117 @@
             line-height: 1.35;
         }
 
+        /* Action Buttons */
+        .event-actions {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-action {
+            background: none;
+            border: 1px solid var(--slds-border);
+            border-radius: var(--slds-radius);
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--slds-text-label);
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-action-edit:hover {
+            border-color: var(--slds-blue);
+            color: var(--slds-blue);
+            background: #f0f7ff;
+        }
+
+        .btn-action-delete:hover {
+            border-color: var(--slds-danger);
+            color: var(--slds-danger);
+            background: #fff5f5;
+        }
+
+        /* Modal Backdrop & Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-dialog {
+            background: var(--slds-surface);
+            width: 100%;
+            max-width: 650px;
+            border-radius: var(--slds-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--slds-border);
+            animation: modalFadeIn 0.2s ease-out;
+            margin: 16px;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--slds-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--slds-text-muted);
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .modal-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--slds-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            background: #fafafa;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            border: 1px solid var(--slds-border);
+            color: var(--slds-text-main);
+            padding: 7px 16px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            border-radius: var(--slds-radius);
+            cursor: pointer;
+        }
+
         .empty-state {
             text-align: center;
             padding: 24px;
@@ -379,6 +490,15 @@
             .event-image-wrapper {
                 width: 100%;
                 height: 120px;
+            }
+            .event-details {
+                padding-right: 0;
+            }
+            .event-actions {
+                position: static;
+                margin-top: 8px;
+                width: 100%;
+                justify-content: flex-end;
             }
         }
     </style>
@@ -423,6 +543,7 @@
         </div>
         
         <form action="upcoming-events" method="post" enctype="multipart/form-data" class="form-grid">
+            <input type="hidden" name="action" value="insert">
             
             <div class="form-group">
                 <label for="event_name">Event Name *</label>
@@ -456,9 +577,9 @@
                 <div class="form-group" style="flex: 1;">
                     <label>Attachment</label>
                     <div class="file-upload-wrapper">
-                        <input type="file" id="image_blob" name="image_blob" accept="image/*" onchange="updateFileName(this)">
+                        <input type="file" id="image_blob" name="image_blob" accept="image/*" onchange="updateFileName(this, 'create-file-label')">
                         <i class="bi bi-paperclip file-upload-icon"></i>
-                        <span class="file-upload-text" id="file-label">Attach Image</span>
+                        <span class="file-upload-text" id="create-file-label">Attach Image</span>
                     </div>
                 </div>
             </div>
@@ -479,6 +600,22 @@
             <c:when test="${not empty events}">
                 <c:forEach var="event" items="${events}">
                     <div class="event-card">
+                        
+                        <div class="event-actions">
+                            <button type="button" class="btn-action btn-action-edit" 
+                                    onclick="openEditModal('${event.id}', '${fn:escapeXml(event.eventName)}', '${event.eventDate}', '${fn:escapeXml(event.place)}', '${event.timeFrom}', '${event.timeTo}', '${fn:escapeXml(event.eventDescription)}')">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            
+                            <form action="upcoming-events" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="${event.id}">
+                                <button type="submit" class="btn-action btn-action-delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+
                         <div class="event-image-wrapper">
                             <c:choose>
                                 <c:when test="${not empty event.imageBase64}">
@@ -527,6 +664,65 @@
 
 </div>
 
+<!-- Modal Dialog for Editing Events -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <span><i class="bi bi-pencil-square" style="color: var(--slds-blue);"></i> Edit Event Record</span>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form action="upcoming-events" method="post" enctype="multipart/form-data">
+            <div class="modal-body form-grid">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" id="edit_id" name="id">
+
+                <div class="form-group">
+                    <label for="edit_event_name">Event Name *</label>
+                    <input type="text" id="edit_event_name" name="event_name" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_event_date">Date *</label>
+                        <input type="date" id="edit_event_date" name="event_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_place">Venue / Location</label>
+                        <input type="text" id="edit_place" name="place" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_time_from">Start Time</label>
+                        <input type="text" id="edit_time_from" name="time_from" class="form-control clock-input" placeholder="00:00" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_time_to">End Time</label>
+                        <input type="text" id="edit_time_to" name="time_to" class="form-control clock-input" placeholder="00:00" readonly>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="edit_event_description">Description</label>
+                        <textarea id="edit_event_description" name="event_description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Replace Image (Optional)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" name="image_blob" accept="image/*" onchange="updateFileName(this, 'edit-file-label')">
+                            <i class="bi bi-paperclip file-upload-icon"></i>
+                            <span class="file-upload-text" id="edit-file-label">New Image</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Flatpickr Engine -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
@@ -537,12 +733,34 @@
         time_24hr: false
     });
 
-    function updateFileName(input) {
-        const label = document.getElementById('file-label');
+    function updateFileName(input, targetId) {
+        const label = document.getElementById(targetId);
         if (input.files && input.files[0]) {
             label.innerText = input.files[0].name;
             label.style.fontWeight = "600";
         }
+    }
+
+    function openEditModal(id, name, date, place, timeFrom, timeTo, description) {
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_event_name').value = name;
+        document.getElementById('edit_event_date').value = date;
+        document.getElementById('edit_place').value = (place && place !== 'null') ? place : '';
+        
+        // Handle time parsing for Flatpickr instance
+        const fpFrom = document.getElementById('edit_time_from')._flatpickr;
+        const fpTo = document.getElementById('edit_time_to')._flatpickr;
+        if (fpFrom) fpFrom.setDate((timeFrom && timeFrom !== 'null') ? timeFrom.substring(0, 5) : '');
+        if (fpTo) fpTo.setDate((timeTo && timeTo !== 'null') ? timeTo.substring(0, 5) : '');
+
+        document.getElementById('edit_event_description').value = (description && description !== 'null') ? description : '';
+        document.getElementById('edit-file-label').innerText = "New Image";
+        
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
     }
 </script>
 
