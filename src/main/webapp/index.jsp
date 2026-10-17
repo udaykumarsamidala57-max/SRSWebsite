@@ -7,9 +7,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><c:choose><c:when test="${not empty activePage}">${fn:escapeXml(activePage.title)} &middot; Page Builder</c:when><c:otherwise>Page Builder</c:otherwise></c:choose></title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<c:url value='/css/builder.css'/>">
 </head>
 <body>
@@ -173,7 +170,11 @@
                     </div>
                     <div class="pb-pagebar-row">
                         <div class="pb-page-title">
-                            <h1>${fn:escapeXml(activePage.title)}</h1>
+                            <span class="pb-page-ico"><svg><use href="#i-page"/></svg></span>
+                            <div class="pb-page-head-text">
+                                <span class="pb-object">Page<c:if test="${not empty parentTitle}"> &middot; under ${fn:escapeXml(parentTitle)}</c:if></span>
+                                <h1>${fn:escapeXml(activePage.title)}</h1>
+                            </div>
                             <span class="pb-chip mono js-copy" title="Click to copy" data-copy="${fn:escapeXml(activePage.slug)}">/${fn:escapeXml(activePage.slug)}</span>
                             <c:choose>
                                 <c:when test="${not empty activePage.parentId}"><span class="pb-chip sub">Sub-page</span></c:when>
@@ -198,8 +199,10 @@
                         </div>
                     </div>
                     <div class="pb-meta">
-                        <span><b>${fn:length(activePage.sections)}</b> sections</span>
-                        <span><b>${mediaTotal}</b> photos &amp; videos</span>
+                        <span>Sections<b>${fn:length(activePage.sections)}</b></span>
+                        <span>Photos &amp; videos<b>${mediaTotal}</b></span>
+                        <span>Web address<b>/${fn:escapeXml(activePage.slug)}</b></span>
+                        <span>Menu position<b><c:choose><c:when test="${not empty parentTitle}">Under ${fn:escapeXml(parentTitle)}</c:when><c:otherwise>Main menu</c:otherwise></c:choose></b></span>
                         <c:if test="${not empty activePage.sections}">
                             <a href="#" class="js-toggle-all" style="margin-left:auto;color:var(--pb-accent-ink);font-weight:600">Collapse all</a>
                         </c:if>

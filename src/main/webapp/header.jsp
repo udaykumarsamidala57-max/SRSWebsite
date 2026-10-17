@@ -18,112 +18,135 @@
 
 <!-- Admin top bar (styles are self-contained so every admin page looks the same) -->
 <style type="text/css">
+    /* Salesforce Lightning-style global header + app navigation bar (88px) */
     .srs-topbar {
         all: initial;
         box-sizing: border-box;
         position: sticky;
         top: 0;
         z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 20px;
+        display: block;
         width: 100%;
-        height: 56px;
-        padding: 0 20px;
-        background: #2b1206;
-        border-bottom: 3px solid #e0701b;
-        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-        color: #fff;
+        font-family: 'Salesforce Sans', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #181818;
         -webkit-font-smoothing: antialiased;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, .12);
     }
     .srs-topbar *, .srs-topbar *::before, .srs-topbar *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: inherit; }
     .srs-topbar a { text-decoration: none; color: inherit; }
-    .srs-topbar .tb-brand { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
-    .srs-topbar .tb-mark {
-        width: 32px; height: 32px; border-radius: 9px;
+
+    .srs-topbar .tb-global {
+        display: flex; align-items: center; gap: 12px;
+        height: 48px; padding: 0 12px;
+        background: #fff; border-bottom: 1px solid #dddbda;
+    }
+    .srs-topbar .tb-logo { display: flex; align-items: center; gap: 8px; }
+    .srs-topbar .tb-logo .mark {
+        width: 28px; height: 28px; border-radius: 4px;
         display: flex; align-items: center; justify-content: center;
-        background: #e0701b; color: #fff; font-size: 13px; font-weight: 800; letter-spacing: .02em;
+        background: #612405; color: #fff; font-size: 11px; font-weight: 700;
     }
-    .srs-topbar .tb-name { display: flex; flex-direction: column; line-height: 1.15; }
-    .srs-topbar .tb-name b { font-size: 14px; font-weight: 700; color: #fff; }
-    .srs-topbar .tb-name small { font-size: 11px; color: #d9b89c; letter-spacing: .04em; }
-    .srs-topbar .tb-nav { display: flex; align-items: stretch; gap: 2px; height: 100%; margin-left: 12px; }
-    .srs-topbar .tb-nav a {
-        position: relative; display: flex; align-items: center; gap: 7px;
-        padding: 0 12px; color: #e9d7c7; font-size: 13px; font-weight: 600;
-        transition: color .15s ease, background-color .15s ease;
+    .srs-topbar .tb-logo b { font-size: 13px; font-weight: 700; color: #181818; }
+    .srs-topbar .tb-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .srs-topbar .tb-branch {
+        height: 20px; padding: 0 8px; border-radius: 15rem;
+        display: inline-flex; align-items: center;
+        background: #ecebea; color: #3e3e3c; font-size: 12px;
     }
-    .srs-topbar .tb-nav a:hover { color: #fff; background: rgba(255,255,255,.06); }
-    .srs-topbar .tb-nav a.active { color: #fff; }
-    .srs-topbar .tb-nav a.active::after {
-        content: ''; position: absolute; left: 10px; right: 10px; bottom: -3px; height: 3px;
-        background: #fff; border-radius: 3px 3px 0 0;
-    }
-    .srs-topbar .tb-nav svg { width: 16px; height: 16px; opacity: .85; }
-    .srs-topbar .tb-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    .srs-topbar .tb-user { display: flex; align-items: center; gap: 9px; padding: 4px 10px 4px 4px; border-radius: 999px; background: rgba(255,255,255,.07); }
     .srs-topbar .tb-avatar {
-        width: 30px; height: 30px; border-radius: 50%;
+        width: 32px; height: 32px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        background: #f6d6bd; color: #612405; font-size: 13px; font-weight: 800;
+        background: #0176d3; color: #fff; font-size: 13px; font-weight: 700;
     }
-    .srs-topbar .tb-user-text { display: flex; flex-direction: column; line-height: 1.15; }
-    .srs-topbar .tb-user-text b { font-size: 12.5px; color: #fff; font-weight: 650; }
-    .srs-topbar .tb-user-text small { font-size: 11px; color: #d9b89c; }
+    .srs-topbar .tb-user-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .srs-topbar .tb-user-text b { font-size: 13px; font-weight: 700; }
+    .srs-topbar .tb-user-text small { font-size: 12px; color: #5c5c5c; }
     .srs-topbar .tb-logout {
         display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
-        border: 1px solid rgba(255,255,255,.22); border-radius: 8px; white-space: nowrap;
-        color: #f3e4d6; font-size: 12.5px; font-weight: 600;
-        transition: background-color .15s ease, border-color .15s ease;
+        border: 1px solid #c9c9c9; border-radius: 4px; background: #fff;
+        color: #0176d3; font-size: 13px; white-space: nowrap;
     }
-    .srs-topbar .tb-logout:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.4); color: #fff; }
-    .srs-topbar .tb-logout svg { width: 15px; height: 15px; }
-    @media (max-width: 1000px) {
-        .srs-topbar .tb-name, .srs-topbar .tb-user-text { display: none; }
+    .srs-topbar .tb-logout:hover { background: #f3f3f3; color: #014486; }
+    .srs-topbar .tb-logout svg { width: 14px; height: 14px; }
+
+    .srs-topbar .tb-appbar {
+        display: flex; align-items: stretch;
+        height: 40px; padding: 0 12px;
+        background: #fff; border-bottom: 3px solid #0176d3;
+    }
+    .srs-topbar .tb-app {
+        display: flex; align-items: center; gap: 10px;
+        padding-right: 24px; margin-right: 8px;
+    }
+    .srs-topbar .tb-waffle { display: grid; grid-template-columns: repeat(3, 4px); gap: 3px; }
+    .srs-topbar .tb-waffle i { width: 4px; height: 4px; border-radius: 50%; background: #747474; display: block; }
+    .srs-topbar .tb-app b { font-size: 18px; font-weight: 400; color: #181818; white-space: nowrap; }
+    .srs-topbar .tb-nav { display: flex; align-items: stretch; }
+    .srs-topbar .tb-nav a {
+        position: relative; display: flex; align-items: center; gap: 6px;
+        padding: 0 12px; color: #181818; font-size: 13px; white-space: nowrap;
+        border-left: 1px solid transparent; border-right: 1px solid transparent;
+    }
+    .srs-topbar .tb-nav a:hover { background: #f3f3f3; }
+    .srs-topbar .tb-nav a.active { font-weight: 700; background: rgba(1, 118, 211, .06); }
+    .srs-topbar .tb-nav a.active::before {
+        content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: #0176d3;
+    }
+    .srs-topbar .tb-nav svg { width: 14px; height: 14px; color: #747474; }
+    .srs-topbar .tb-nav a.active svg { color: #0176d3; }
+    @media (max-width: 900px) {
+        .srs-topbar .tb-user-text, .srs-topbar .tb-branch, .srs-topbar .tb-logo b { display: none; }
+        .srs-topbar .tb-app b { font-size: 15px; }
+        .srs-topbar .tb-app { padding-right: 8px; }
         .srs-topbar .tb-nav a span { display: none; }
-        .srs-topbar .tb-nav a { padding: 0 10px; }
+        .srs-topbar .tb-appbar { overflow-x: auto; }
     }
 </style>
 
 <header class="srs-topbar">
-    <a class="tb-brand" href="<c:url value='/pages'/>">
-        <span class="tb-mark">SRS</span>
-        <span class="tb-name"><b>Website Admin</b><small>Sandur Residential School</small></span>
-    </a>
-
-    <nav class="tb-nav">
-        <a href="<c:url value='/pages'/>" data-match="/pages,/index.jsp">
-            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6"/></svg>
-            <span>Pages</span>
+    <div class="tb-global">
+        <a class="tb-logo" href="<c:url value='/pages'/>">
+            <span class="mark">SRS</span>
+            <b>Sandur Residential School</b>
         </a>
-        <a href="<c:url value='/LatestNewsServlet'/>" data-match="/LatestNewsServlet,/latestNews.jsp">
-            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h13v16H6a2 2 0 0 1-2-2Z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg>
-            <span>Latest News</span>
-        </a>
-        <a href="<c:url value='/upcoming-events'/>" data-match="/upcoming-events,/upcoming_events.jsp">
-            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
-            <span>Upcoming Events</span>
-        </a>
-        <% if (canMove) { %>
-        <a href="<c:url value='/admin/move-photos'/>" data-match="/admin/move-photos">
-            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
-            <span>Photo storage</span>
-        </a>
-        <% } %>
-    </nav>
-
-    <div class="tb-right">
-        <div class="tb-user" title="Signed in">
-            <span class="tb-avatar"><%= initials %></span>
+        <div class="tb-right">
+            <c:if test="${not empty sessionScope.branch}"><span class="tb-branch">${fn:escapeXml(sessionScope.branch)}</span></c:if>
+            <span class="tb-avatar" title="${fn:escapeXml(sessionScope.username)}"><%= initials %></span>
             <span class="tb-user-text">
                 <b>${fn:escapeXml(sessionScope.username)}</b>
-                <small>${fn:escapeXml(sessionScope.role)}<c:if test="${not empty sessionScope.branch}"> &middot; ${fn:escapeXml(sessionScope.branch)}</c:if></small>
+                <small>${fn:escapeXml(sessionScope.role)}</small>
             </span>
+            <a href="Logout.jsp" class="tb-logout">
+                <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 17l5-5-5-5M20 12H9M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/></svg>
+                Log out
+            </a>
         </div>
-        <a href="Logout.jsp" class="tb-logout">
-            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 17l5-5-5-5M20 12H9M12 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/></svg>
-            Log out
-        </a>
+    </div>
+    <div class="tb-appbar">
+        <div class="tb-app">
+            <span class="tb-waffle"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <b>Website Admin</b>
+        </div>
+        <nav class="tb-nav">
+            <a href="<c:url value='/pages'/>" data-match="/pages,/index.jsp">
+                <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6"/></svg>
+                <span>Pages</span>
+            </a>
+            <a href="<c:url value='/LatestNewsServlet'/>" data-match="/LatestNewsServlet,/latestNews.jsp">
+                <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h13v16H6a2 2 0 0 1-2-2Z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg>
+                <span>Latest News</span>
+            </a>
+            <a href="<c:url value='/upcoming-events'/>" data-match="/upcoming-events,/upcoming_events.jsp">
+                <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+                <span>Upcoming Events</span>
+            </a>
+            <% if (canMove) { %>
+            <a href="<c:url value='/admin/move-photos'/>" data-match="/admin/move-photos">
+                <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                <span>Photo Storage</span>
+            </a>
+            <% } %>
+        </nav>
     </div>
 </header>
 <script>
