@@ -23,6 +23,8 @@
         <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
         <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></symbol>
         <symbol id="i-page" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6"/></symbol>
+        <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-7 9 7"/><path d="M5 10v10h14V10"/></symbol>
         <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 13 9 5 9-5"/></symbol>
         <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
         <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></symbol>
@@ -78,6 +80,7 @@
             </label>
         </div>
 
+        <div class="pb-tree-label"><span>Main menu</span><span>Sub</span></div>
         <ul class="pb-tree" id="pageTree">
             <c:forEach var="p" items="${pages}">
                 <c:if test="${empty p.parentId}">
@@ -91,9 +94,19 @@
                             <button type="button" class="pb-twisty ${subCount > 0 ? '' : 'blank'}" data-group="${p.id}" aria-label="Show sub-pages">
                                 <svg><use href="#i-chev"/></svg>
                             </button>
-                            <a class="pb-node-link" href="pages?action=view&id=${p.id}" title="${fn:escapeXml(p.title)}">
-                                <span class="pb-node-title">${fn:escapeXml(p.title)}</span>
-                                <span class="pb-node-slug">/${fn:escapeXml(p.slug)}<c:if test="${subCount > 0}"> &middot; ${subCount} sub</c:if></span>
+                            <a class="pb-node-link" href="pages?action=view&id=${p.id}" title="${fn:escapeXml(p.title)} &#10;/${fn:escapeXml(p.slug)}">
+                                <span class="pb-node-ico">
+                                    <c:choose>
+                                        <c:when test="${fn:toLowerCase(p.slug) == 'home'}"><svg><use href="#i-home"/></svg></c:when>
+                                        <c:when test="${subCount > 0}"><svg><use href="#i-folder"/></svg></c:when>
+                                        <c:otherwise><svg><use href="#i-page"/></svg></c:otherwise>
+                                    </c:choose>
+                                </span>
+                                <span class="pb-node-text">
+                                    <span class="pb-node-title">${fn:escapeXml(p.title)}</span>
+                                    <span class="pb-node-slug">/${fn:escapeXml(p.slug)}</span>
+                                </span>
+                                <c:if test="${subCount > 0}"><span class="pb-node-count">${subCount}</span></c:if>
                             </a>
                             <div class="pb-node-actions">
                                 <button type="button" class="pb-icon-btn btn-edit-page" title="Edit page details"
@@ -116,9 +129,12 @@
                                         <li class="pb-tree-item" data-search="${fn:escapeXml(fn:toLowerCase(sub.title))} ${fn:escapeXml(fn:toLowerCase(sub.slug))}">
                                             <div class="pb-node ${activePage.id == sub.id ? 'active' : ''}">
                                                 <span class="pb-twisty blank"></span>
-                                                <a class="pb-node-link" href="pages?action=view&id=${sub.id}" title="${fn:escapeXml(sub.title)}">
-                                                    <span class="pb-node-title">${fn:escapeXml(sub.title)}</span>
-                                                    <span class="pb-node-slug">/${fn:escapeXml(sub.slug)}</span>
+                                                <a class="pb-node-link" href="pages?action=view&id=${sub.id}" title="${fn:escapeXml(sub.title)} &#10;/${fn:escapeXml(sub.slug)}">
+                                                    <span class="pb-node-ico"><svg><use href="#i-page"/></svg></span>
+                                                    <span class="pb-node-text">
+                                                        <span class="pb-node-title">${fn:escapeXml(sub.title)}</span>
+                                                        <span class="pb-node-slug">/${fn:escapeXml(sub.slug)}</span>
+                                                    </span>
                                                 </a>
                                                 <div class="pb-node-actions">
                                                     <button type="button" class="pb-icon-btn btn-edit-page" title="Edit page details"
