@@ -106,8 +106,8 @@
 <header class="srs-topbar">
     <div class="tb-global">
         <a class="tb-logo" href="<c:url value='/pages'/>">
-            <span class="mark">SRS</span>
-            <b>Sandur Residential School</b>
+            <span class="mark">SSS</span>
+            <b>Shivapur Shikshana Samiti</b>
         </a>
         <div class="tb-right">
             <c:if test="${not empty sessionScope.branch}"><span class="tb-branch">${fn:escapeXml(sessionScope.branch)}</span></c:if>

@@ -173,7 +173,7 @@ public class PhotoMoveServlet extends HttpServlet {
             for (String l : log) out.println(l + "<br>");
             out.println("</div>");
         }
-        out.println("</main></body></html>");
+        out.println("</main><p style='max-width:820px;margin:16px auto 0;text-align:center;font-size:12px;color:#5c5c5c'>Developed and Maintained by : <b>SSS IT - Office Central</b></p></body></html>");
     }
 
     // =========================================================

@@ -644,5 +644,6 @@
 </c:if>
 
 <script src="<c:url value='/js/builder.js'/>"></script>
+<jsp:include page="footer.jsp" />
 </body>
 </html>

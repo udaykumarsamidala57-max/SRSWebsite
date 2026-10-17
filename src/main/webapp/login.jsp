@@ -188,5 +188,6 @@
             pwd.type = pwd.type === "password" ? "text" : "password";
         }
     </script>
+<jsp:include page="footer.jsp" />
 </body>
 </html>
