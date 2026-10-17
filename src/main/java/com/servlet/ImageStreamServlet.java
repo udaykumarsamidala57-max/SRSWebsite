@@ -1,6 +1,8 @@
 package com.servlet;
 
 import com.bean.DBUtil;
+import com.bean.PhotoStore;
+import com.bean.PhotoUpload;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -61,6 +63,14 @@ public class ImageStreamServlet extends HttpServlet {
         try (Connection conn = DBUtil.getConnection(branch);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            // photo kept in the bucket: send the browser to its link
+            String bucketKey = PhotoUpload.keyOf(conn, "section_images", imageId);
+            if (bucketKey != null && PhotoStore.enabled()) {
+                response.setHeader("Cache-Control", "private, max-age=2400");
+                response.sendRedirect(PhotoStore.url(bucketKey));
+                return;
+            }
+
             stmt.setLong(1, imageId);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -108,4 +118,4 @@ public class ImageStreamServlet extends HttpServlet {
         // Customize allowed roles based on your application's access control rules
         return role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("USER");
     }
-}
+}

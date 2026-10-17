@@ -2,6 +2,8 @@ package com.servlet;
 
 import com.bean.PageBean;
 import com.bean.DBUtil;
+import com.bean.PhotoStore;
+import com.bean.PhotoUpload;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -521,7 +523,9 @@ public class PageServlet extends HttpServlet {
                             alt,
                             order,
                             heading1,
-                            heading2
+                            heading2,
+                            filePart.getSize(),
+                            branch
                     );
                 }
 
@@ -616,7 +620,9 @@ public class PageServlet extends HttpServlet {
                                 alt,
                                 order,
                                 heading1,
-                                heading2
+                                heading2,
+                                filePart.getSize(),
+                                branch
                         );
                     }
 
@@ -763,6 +769,14 @@ public class PageServlet extends HttpServlet {
             HttpServletResponse resp)
             throws SQLException, IOException {
 
+        // photo kept in the bucket: send the browser to its link
+        String bucketKey = PhotoUpload.keyOf(conn, "section_images", imageId);
+        if (bucketKey != null && PhotoStore.enabled()) {
+            resp.setHeader("Cache-Control", "private, max-age=2400");
+            resp.sendRedirect(PhotoStore.url(bucketKey));
+            return;
+        }
+
         String sql =
                 "SELECT image_data, image_type " +
                 "FROM section_images " +
@@ -862,8 +876,45 @@ public class PageServlet extends HttpServlet {
             String altText,
             int order,
             String heading1,
-            String heading2)
+            String heading2,
+            long size,
+            String branch)
             throws SQLException {
+
+        // SRS: picture goes to the bucket, MySQL keeps only its place
+        if (PhotoUpload.on(branch)) {
+            long newId;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO section_images " +
+                    "(section_id, image_data, image_type, " +
+                    "alt_text, sequence_order, Heading1, Heading2) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS)) {
+                ps.setLong(1, sectionId);
+                ps.setBytes(2, new byte[0]);
+                ps.setString(3, type);
+                ps.setString(4, altText);
+                ps.setInt(5, order);
+                ps.setString(6, heading1);
+                ps.setString(7, heading2);
+                ps.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    keys.next();
+                    newId = keys.getLong(1);
+                }
+            }
+            try {
+                PhotoUpload.store(conn, "section_images", "image_data", newId, branch,
+                        "sections", is, size, type);
+            } catch (SQLException e) {
+                try (PreparedStatement undo = conn.prepareStatement("DELETE FROM section_images WHERE id = ?")) {
+                    undo.setLong(1, newId);
+                    undo.executeUpdate();
+                }
+                throw e;
+            }
+            return;
+        }
 
         String sql =
                 "INSERT INTO section_images " +
@@ -922,8 +973,24 @@ public class PageServlet extends HttpServlet {
             String altText,
             int order,
             String heading1,
-            String heading2)
+            String heading2,
+            long size,
+            String branch)
             throws SQLException {
+
+        // SRS: new picture goes to the bucket, the old file is removed
+        if (PhotoUpload.on(branch)) {
+            updateImageMetadata(conn, imageId, altText, order, heading1, heading2);
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE section_images SET image_type = ? WHERE id = ?")) {
+                ps.setString(1, type);
+                ps.setLong(2, imageId);
+                ps.executeUpdate();
+            }
+            PhotoUpload.store(conn, "section_images", "image_data", imageId, branch,
+                    "sections", is, size, type);
+            return;
+        }
 
         String sql =
                 "UPDATE section_images SET " +
@@ -1559,6 +1626,9 @@ public class PageServlet extends HttpServlet {
             Long id)
             throws SQLException {
 
+        java.util.List<String> files = PhotoUpload.keys(conn,
+                "SELECT i.file_key FROM section_images i JOIN sections s ON s.id = i.section_id WHERE s.page_id = ?", id);
+
         String sql =
                 "DELETE FROM pages WHERE id = ?";
 
@@ -1572,6 +1642,8 @@ public class PageServlet extends HttpServlet {
 
             ps.executeUpdate();
         }
+
+        PhotoUpload.deleteFilesIfUnused(conn, "section_images", files);
     }
 
     // =========================================================
@@ -1582,6 +1654,9 @@ public class PageServlet extends HttpServlet {
             Connection conn,
             Long sectionId)
             throws SQLException {
+
+        java.util.List<String> files = PhotoUpload.keys(conn,
+                "SELECT file_key FROM section_images WHERE section_id = ?", sectionId);
 
         String sql =
                 "DELETE FROM sections WHERE id = ?";
@@ -1596,6 +1671,8 @@ public class PageServlet extends HttpServlet {
 
             ps.executeUpdate();
         }
+
+        PhotoUpload.deleteFilesIfUnused(conn, "section_images", files);
     }
 
     // =========================================================
@@ -1606,6 +1683,9 @@ public class PageServlet extends HttpServlet {
             Connection conn,
             Long imageId)
             throws SQLException {
+
+        java.util.List<String> files = PhotoUpload.keys(conn,
+                "SELECT file_key FROM section_images WHERE id = ?", imageId);
 
         String sql =
                 "DELETE FROM section_images WHERE id = ?";
@@ -1620,5 +1700,7 @@ public class PageServlet extends HttpServlet {
 
             ps.executeUpdate();
         }
+
+        PhotoUpload.deleteFilesIfUnused(conn, "section_images", files);
     }
-}
+}

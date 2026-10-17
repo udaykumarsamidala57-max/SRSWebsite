@@ -2,6 +2,7 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Base64" %>
 <%@ page import="com.bean.DBUtil" %>
+<%@ page import="com.bean.PhotoUpload" %>
 
 <%!
     // Helper method to sanitize HTML output and prevent XSS vulnerabilities
@@ -44,10 +45,10 @@
                     eventName = rs.getString("event_name");
                     description = rs.getString("description");
 
-                    byte[] imgBytes = rs.getBytes("image");
-                    if (imgBytes != null && imgBytes.length > 0) {
-                        base64Image = Base64.getEncoder().encodeToString(imgBytes);
-                    }
+                    String editKey = null;
+                    try { editKey = rs.getString("file_key"); } catch (SQLException noColumn) { }
+                    byte[] imgBytes = (editKey != null && !editKey.trim().isEmpty()) ? null : rs.getBytes("image");
+                    base64Image = PhotoUpload.src(editKey, imgBytes);
                 }
             }
         } catch (NumberFormatException e) {
@@ -530,7 +531,7 @@
                             
                             <% if (!base64Image.isEmpty()) { %>
                                 <div class="current-image-wrapper">
-                                    <img src="data:image/jpeg;base64,<%= base64Image %>" class="img-preview" alt="Current Image">
+                                    <img src="<%= base64Image %>" class="img-preview" alt="Current Image">
                                     <span style="font-size: 0.75rem; color: var(--slds-text-muted);">Current Active</span>
                                 </div>
                             <% } %>
@@ -568,7 +569,7 @@
                     </thead>
                     <tbody>
                         <%
-                            String sqlList = "SELECT id, event_name, description, image, created_at FROM latest_news ORDER BY created_at DESC";
+                            String sqlList = "SELECT * FROM latest_news ORDER BY created_at DESC";
 
                             try (Connection con = DBUtil.getConnection(branch);
                                  PreparedStatement ps = con.prepareStatement(sqlList);
@@ -578,12 +579,10 @@
 
                                 while (rs.next()) {
                                     found = true;
-                                    byte[] imgBytes = rs.getBytes("image");
-                                    String rowBase64Image = "";
-
-                                    if (imgBytes != null && imgBytes.length > 0) {
-                                        rowBase64Image = Base64.getEncoder().encodeToString(imgBytes);
-                                    }
+                                    String rowKey = null;
+                                    try { rowKey = rs.getString("file_key"); } catch (SQLException noColumn) { }
+                                    byte[] imgBytes = (rowKey != null && !rowKey.trim().isEmpty()) ? null : rs.getBytes("image");
+                                    String rowBase64Image = PhotoUpload.src(rowKey, imgBytes);
                                     
                                     int rowId = rs.getInt("id");
                                     String rowEvent = rs.getString("event_name");
@@ -594,7 +593,7 @@
                             <td><strong>#<%= rowId %></strong></td>
                             <td>
                                 <% if (!rowBase64Image.isEmpty()) { %>
-                                    <img src="data:image/jpeg;base64,<%= rowBase64Image %>" class="img-preview" alt="News Image">
+                                    <img src="<%= rowBase64Image %>" class="img-preview" alt="News Image">
                                 <% } else { %>
                                     <span class="no-img-badge">None</span>
                                 <% } %>
@@ -647,4 +646,4 @@
 </script>
 
 </body>
-</html>
+</html>

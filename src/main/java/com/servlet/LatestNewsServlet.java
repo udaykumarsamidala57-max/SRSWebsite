@@ -1,6 +1,7 @@
 package com.servlet;
 
 import com.bean.DBUtil;
+import com.bean.PhotoUpload;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -83,6 +84,37 @@ public class LatestNewsServlet extends HttpServlet {
         String description = request.getParameter("description");
         Part imagePart = request.getPart("image");
 
+        // SRS: picture goes to the bucket, MySQL keeps only its place
+        if (PhotoUpload.on(branch) && imagePart != null && imagePart.getSize() > 0) {
+            try (Connection con = DBUtil.getConnection(branch)) {
+                long newId;
+                try (PreparedStatement ps = con.prepareStatement(
+                        "INSERT INTO latest_news (event_name, description, image) VALUES (?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, eventName);
+                    ps.setString(2, description);
+                    ps.setBytes(3, new byte[0]);
+                    ps.executeUpdate();
+                    try (ResultSet keys = ps.getGeneratedKeys()) {
+                        keys.next();
+                        newId = keys.getLong(1);
+                    }
+                }
+                try (InputStream in = imagePart.getInputStream()) {
+                    PhotoUpload.store(con, "latest_news", "image", newId, branch, "news",
+                            in, imagePart.getSize(), imagePart.getContentType());
+                } catch (SQLException e) {
+                    try (PreparedStatement undo = con.prepareStatement("DELETE FROM latest_news WHERE id = ?")) {
+                        undo.setLong(1, newId);
+                        undo.executeUpdate();
+                    }
+                    throw e;
+                }
+            }
+            response.sendRedirect("latestNews.jsp?success=added");
+            return;
+        }
+
         String sql = "INSERT INTO latest_news (event_name, description, image) VALUES (?, ?, ?)";
 
         try (Connection con = DBUtil.getConnection(branch);
@@ -113,7 +145,22 @@ public class LatestNewsServlet extends HttpServlet {
         String description = request.getParameter("description");
         Part imagePart = request.getPart("image");
 
-        if (imagePart != null && imagePart.getSize() > 0) {
+        if (PhotoUpload.on(branch) && imagePart != null && imagePart.getSize() > 0) {
+            // SRS: text in MySQL, new picture in the bucket (old file removed)
+            try (Connection con = DBUtil.getConnection(branch)) {
+                try (PreparedStatement ps = con.prepareStatement(
+                        "UPDATE latest_news SET event_name=?, description=? WHERE id=?")) {
+                    ps.setString(1, eventName);
+                    ps.setString(2, description);
+                    ps.setInt(3, id);
+                    ps.executeUpdate();
+                }
+                try (InputStream in = imagePart.getInputStream()) {
+                    PhotoUpload.store(con, "latest_news", "image", id, branch, "news",
+                            in, imagePart.getSize(), imagePart.getContentType());
+                }
+            }
+        } else if (imagePart != null && imagePart.getSize() > 0) {
             // Update including the new image BLOB
             String sql = "UPDATE latest_news SET event_name=?, description=?, image=? WHERE id=?";
 
@@ -152,13 +199,16 @@ public class LatestNewsServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         String deleteSQL = "DELETE FROM latest_news WHERE id=?";
 
-        try (Connection con = DBUtil.getConnection(branch);
-             PreparedStatement ps = con.prepareStatement(deleteSQL)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        try (Connection con = DBUtil.getConnection(branch)) {
+            java.util.List<String> files = PhotoUpload.keys(con,
+                    "SELECT file_key FROM latest_news WHERE id = ?", id);
+            try (PreparedStatement ps = con.prepareStatement(deleteSQL)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+            PhotoUpload.deleteFilesIfUnused(con, "latest_news", files);
         }
 
         response.sendRedirect("latestNews.jsp?success=deleted");
     }
-}
+}
