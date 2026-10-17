@@ -618,8 +618,8 @@
 
                         <div class="event-image-wrapper">
                             <c:choose>
-                                <c:when test="${not empty event.imageBase64}">
-                                    <img src="data:image/jpeg;base64,${event.imageBase64}" alt="${event.eventName}" class="event-image" />
+                                <c:when test="${not empty event.imageSrc}">
+                                    <img src="${event.imageSrc}" alt="${event.eventName}" class="event-image" />
                                 </c:when>
                                 <c:otherwise>
                                     <div class="no-image">
@@ -764,5 +764,6 @@
     }
 </script>
 
+<jsp:include page="footer.jsp" />
 </body>
-</html>
+</html>

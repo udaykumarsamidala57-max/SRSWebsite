@@ -10,5 +10,6 @@ com\bean\PhotoStore.class
 com\bean\PageBean$SectionImage.class
 com\servlet\HomeDataServlet.class
 com\servlet\UpcomingEventsServlet.class
+com\bean\PhotoUpload.class
 com\servlet\LatestNewsServlet.class
 com\servlet\NavigationServlet.class
